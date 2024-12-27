@@ -1,5 +1,6 @@
 // Navbar.jsx
 import { useState } from "react";
+import logo from "../assets/logo.png";
 
 // Navbar.jsx
 const Navbar = () => {
@@ -8,7 +9,13 @@ const Navbar = () => {
       {/* Top Navbar */}
       <div className="container mx-auto px-4 py-2 flex items-center justify-between">
         {/* Logo */}
-        <div className="text-xl font-bold">Logo</div>
+        <div>
+          <img
+            src={logo}
+            alt="Logo"
+            className="h-20"
+          />
+          </div>
 
         {/* Search Bar */}
         <div className="flex-grow mx-4">
