@@ -1,0 +1,34 @@
+package com.ecom.backend.service;
+
+import com.ecom.backend.model.Cart;
+import com.ecom.backend.repositoty.CartRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class CartService {
+    @Autowired
+    private CartRepository cartRepository;
+
+    public Cart getCartByUserId(String userId) {
+        return cartRepository.findByUserId(userId);
+    }
+
+    public Cart addToCart(String userId, Cart.CartItem cartItem) {
+        Cart cart = cartRepository.findByUserId(userId);
+        if (cart == null) {
+            cart = new Cart();
+            cart.setUserId(userId);
+        }
+        cart.getItems().add(cartItem);
+        return cartRepository.save(cart);
+    }
+
+    public void clearCart(String userId) {
+        Cart cart = cartRepository.findByUserId(userId);
+        if (cart != null) {
+            cart.getItems().clear();
+            cartRepository.save(cart);
+        }
+    }
+}
