@@ -1,5 +1,5 @@
 import cart from '../assets/cart-shopping-fast-svgrepo-com.svg';
-import Ecom from '../assets/cart-svgrepo-com.svg';
+import Logo from '../assets/logo.png';
 import search from '../assets/search-alt-2-svgrepo-com.svg';
 import { useState } from 'react';
 
@@ -12,10 +12,11 @@ const Topbar = () => {
 
   return (
     <header className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-4 sticky top-0 z-50">
+
       <div className=" flex items-center relative ">
         {/* Left: Logo */}
         <div className="flex items-center">
-          <img src={Ecom} alt="Logo" className="h-8 w-auto" />
+          <img src={Logo} alt="Logo" className="h-12 w-auto" />
         </div>
 
         {/* Center: Search Bar */}

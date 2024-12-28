@@ -1,5 +1,5 @@
 import { useState } from "react";
-import logo from "../assets/logo.png";
+
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -9,13 +9,11 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 text-gray-900 sticky top-0 z-50">
+    <nav className="bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 text-gray-900 sticky top-[80px] z-40">
+
       <div className="max-w-screen-xl mx-auto flex flex-wrap md:flex-nowrap text-sm items-center justify-between py-2 px-4">
         <div className="flex items-center">
-          {/* Logo */}
-          <div>
-            <img src={logo} alt="Logo" className="h-20" />
-          </div>
+          
           <button
             onClick={toggleMobileMenu}
             className="md:hidden text-gray-900 p-2"

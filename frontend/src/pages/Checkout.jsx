@@ -26,10 +26,10 @@ const order ={
 const CheckoutPage = () => {
   return (
     <>
-       <header >
-          <Topbar/>
-       
+       <header className="sticky top-0 z-50">
+        <Topbar />
       </header>
+      
       <div className="min-h-screen bg-gray-100 flex  items-center">
       
         
