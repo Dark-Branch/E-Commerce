@@ -70,7 +70,7 @@ const ShoppingCartPage = () => {
                     -
                   </button>
                 </div>
-                <button className="text-blue-600 text-sm bg-gray-200 p-2 rounded-md m-2">Buy it now</button>
+                <button className="text-blue-600 text-sm bg-gray-200 p-2 rounded-md m-2">Buy now</button>
                 <button
                   onClick={() => removeItem(item.id)}
                   className="text-red-600 text-sm  bg-gray-200 p-2 rounded-md m-2"
