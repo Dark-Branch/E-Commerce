@@ -4,7 +4,6 @@ import search from '../assets/search-alt-2-svgrepo-com.svg';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-
 const Topbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -18,7 +17,7 @@ const Topbar = () => {
       <div className=" flex items-center relative ">
         {/* Left: Logo */}
         <div className="flex items-center">
-          <Link to="/">
+          <Link to="/"> 
             <img src={Logo} alt="Logo" className="h-12 w-auto" />
           </Link>
         </div>
@@ -37,14 +36,17 @@ const Topbar = () => {
 
         {/* Right: Login, Signup, and Cart */}
         <div className="absolute right-0 flex  space-x-4 md:space-x-6">
-          <div className="hidden md:flex items-center space-x-4">
-            <a href="/login" className="text-white px-4 py-2 rounded-md hover:bg-purple-600 transition-colors duration-300">
-              Login
-            </a>
-            <a href="/signup" className="text-white px-4 py-2 rounded-md hover:bg-purple-600 transition-colors duration-300">
-              Sign Up
-            </a>
-          </div>
+
+            <div className="hidden md:flex items-center space-x-4">
+                <a href="/profile" className="flex items-center space-x-2">
+                <img
+                    src="https://via.placeholder.com/40" // Replace this with the actual profile picture URL
+                    alt="User Profile"
+                    className="w-10 h-10 rounded-full object-cover"
+                />
+                </a>
+            </div>
+
 
           <a href="/cart" className="text-white text-2xl relative">
             <img src={cart} alt="Cart" className="h-8 w-auto hidden md:flex" />
