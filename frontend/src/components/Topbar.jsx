@@ -1,9 +1,9 @@
 import cart from '../assets/cart-shopping-fast-svgrepo-com.svg';
+import Ecom from '../assets/cart-svgrepo-com.svg';
 import Logo from '../assets/logo.png';
 import search from '../assets/search-alt-2-svgrepo-com.svg';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-
 
 const Topbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -14,8 +14,7 @@ const Topbar = () => {
 
   return (
     <header className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-4 sticky top-0 z-50">
-
-      <div className=" flex items-center relative ">
+      <div className="flex items-center relative">
         {/* Left: Logo */}
         <div className="flex items-center">
           <Link to="/">
@@ -30,13 +29,13 @@ const Topbar = () => {
             placeholder="Search..."
             className="w-full max-w-lg p-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
-          <button className="flex items-center  bg-white p-2 rounded-full w-9  mx-3">
-              <img src={search}/>
-          </button >
+          <button className="flex items-center bg-white p-2 rounded-full w-9 mx-3">
+            <img src={search} alt="Search Icon" />
+          </button>
         </div>
 
         {/* Right: Login, Signup, and Cart */}
-        <div className="absolute right-0 flex  space-x-4 md:space-x-6">
+        <div className="absolute right-0 flex space-x-4 md:space-x-6">
           <div className="hidden md:flex items-center space-x-4">
             <a href="/login" className="text-white px-4 py-2 rounded-md hover:bg-purple-600 transition-colors duration-300">
               Login
@@ -86,15 +85,13 @@ const Topbar = () => {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-purple-300 p-4 flex flex-col items-center">
-          <div>
+          <div className="flex items-center space-x-2 bg-white p-2 rounded-full w-full mb-4">
             <input
               type="text"
-              placeholder="search..."
-              className="w-full mb-4 p-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              placeholder="Search..."
+              className="flex-grow p-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
-            <div className="flex items-center space-x- bg-white p-2 rounded-full">
-              <img src={search}/>
-            </div>
+            <img src={search} alt="Search Icon" />
           </div>
           <a href="/login" className="text-white w-full text-center py-2 rounded-md hover:bg-purple-600 transition-colors duration-300 mb-2">
             Login
