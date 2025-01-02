@@ -3,7 +3,10 @@ package com.ecom.backend.controller;
 import com.ecom.backend.model.Cart;
 import com.ecom.backend.model.Product;
 import com.ecom.backend.service.CartService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -16,13 +19,19 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
+    private static final Logger logger = LoggerFactory.getLogger(CartController.class);
+
     @GetMapping("/{id}")
     public ResponseEntity<Cart> getCartById(@PathVariable String id){
-        Cart cart = cartService.getCartById(id);
-        if (cart != null) {
+        Cart cart;
+        try {
+            cart = cartService.getCartById(id);
             return ResponseEntity.ok(cart);
-        } else {
+        } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
+        }catch (Exception e) {
+            logger.error("Internal server error: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 //  this is the real one

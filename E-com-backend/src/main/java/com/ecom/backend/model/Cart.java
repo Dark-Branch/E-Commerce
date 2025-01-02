@@ -27,3 +27,4 @@ public class Cart {
         private String version;
     }
 }
+// TODO: add discounts

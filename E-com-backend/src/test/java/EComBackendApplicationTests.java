@@ -196,6 +196,16 @@ class EComBackendApplicationTests {
 	}
 
 	@Test
+	public void testGetCartById_CartDoesNotExist() {
+		// Act: Make the GET request for a non-existing cart
+		ResponseEntity<Cart> response = restTemplate.getForEntity("/cart/nonExistingId", Cart.class);
+
+		// Assert: Check the response
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+		assertThat(response.getBody()).isNull();
+	}
+
+	@Test
 	public void testAddProductToCart() {
 		// Create product
 		Product product = new Product();
