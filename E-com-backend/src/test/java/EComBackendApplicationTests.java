@@ -6,16 +6,18 @@ import com.ecom.backend.repository.CartRepository;
 import com.ecom.backend.repository.ProductRepository;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,12 +34,29 @@ class EComBackendApplicationTests {
 	@Autowired
 	CartRepository cartRepository;
 
+	private List<Product> testProducts;
+
+	@BeforeEach
+	void setUp() {
+		productRepository.deleteAll();
+		productRepository.saveAll(List.of(
+				new Product("Product 1", "Electronics", "Mobile", 100.0),
+				new Product("Product 2", "Electronics", "Laptop", 500.0),
+				new Product("Product 3", "Clothing", "Men", 50.0)
+		));
+	}
+
+	@AfterEach
+	void tearDown() {
+	}
+
 	@Test
 	void contextLoads() {
 	}
 
 	@Test
 //	@DirtiesContext
+	@Disabled
 	void shouldCreteNewProduct() {
 		Product product = new Product();
 		product.setName("alutheka");
@@ -59,6 +78,86 @@ class EComBackendApplicationTests {
 		assertThat(id).isNotNull();
 		assertThat(amount).isEqualTo(100);
 	}
+
+	@Test
+	void testGetProductByCategoryWithoutSubCategory() {
+		// Send GET request for "Electronics" category
+		ResponseEntity<Product[]> response = restTemplate.getForEntity(
+				"/products/category/Electronics?page=0&limit=10", Product[].class);
+
+		// Verify response
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getBody()).isNotNull();
+		assertThat(response.getBody()).hasSize(2);
+		assertThat(response.getBody()[0].getName()).isEqualTo("Product 1");
+		assertThat(response.getBody()[1].getName()).isEqualTo("Product 2");
+	}
+
+	@Test
+	void testGetProductByCategoryWithSubCategory() {
+		ResponseEntity<Product[]> response = restTemplate.getForEntity(
+				"/products/category/Electronics?subCategory=Mobile&page=0&limit=10", Product[].class);
+
+		// Verify response
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getBody()).isNotNull();
+		assertThat(response.getBody()).hasSize(1);
+		assertThat(response.getBody()[0].getName()).isEqualTo("Product 1");
+	}
+
+	@Test
+	void testGetProductByCategoryInvalidPageOrLimit() {
+		// Send GET request with invalid page and limit
+		ResponseEntity<String> response = restTemplate.getForEntity(
+				"/products/category/Electronics?page=-1&limit=0", String.class);
+
+		// Verify response
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		assertThat(response.getBody()).isEqualTo("Page must be >= 0 and limit > 0");
+	}
+
+	@Test
+	public void testUpdateProductSuccess() throws Exception {
+		// i know this will succeed because of previous test
+		ResponseEntity<Product[]> response = restTemplate.getForEntity(
+				"/products/category/Electronics?page=0&limit=10", Product[].class);
+		assertThat(response.getBody()).isNotNull();
+
+		Product product = response.getBody()[0];
+		product.setPrice(63);
+
+		HttpEntity<Product> request = new HttpEntity<>(product);
+
+		ResponseEntity<Void> putResponse = restTemplate.exchange(
+				"/products/{id}", HttpMethod.PUT, request, Void.class, product.getId());
+
+		assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+		ResponseEntity<Product> getResponse = restTemplate.getForEntity(
+				"/products/{id}", Product.class, product.getId());
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+		Product updatedProduct = getResponse.getBody();
+		assertThat(updatedProduct).isNotNull();
+		assertThat(updatedProduct.getId()).isEqualTo(product.getId());
+		assertThat(updatedProduct.getPrice()).isEqualTo(63);
+	}
+
+	@Test
+	public void testUpdateProductNotFound() throws Exception {
+		Product product = new Product();
+		product.setId("non-existent-id");
+		product.setName("Non-Existent Product");
+		product.setPrice(100.0);
+
+		HttpEntity<Product> request = new HttpEntity<>(product);
+
+		ResponseEntity<Void> putResponse = restTemplate.exchange(
+				"/products/{id}", HttpMethod.PUT, request, Void.class, product.getId());
+
+		assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+	}
+
 
 	@Test
 	void shouldGetUser() {

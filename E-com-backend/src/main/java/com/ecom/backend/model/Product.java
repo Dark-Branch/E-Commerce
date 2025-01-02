@@ -15,20 +15,27 @@ import java.util.List;
 public class Product {
 
     @Id
-    private String id; // Unique identifier for the product
-    private String name; // Product name
-    private double price; // Product price
-    private double rating; // Product rating (0-5)
-    private String mainImg; // URL for the main product image
-    private String brand; // Brand of the product
-    private String category; // Primary category of the product
-    private String subCategory; // Sub-category of the product
-    private List<String> tags; // Tags associated with the product (max 10)
-    private int inventoryCount; // Number of items left in inventory
-    private List<String> otherImages; // URLs of additional images
-    private String description; // Detailed product description
+    private String id;
+    private String name;
+    private double price;
+    private double rating; // (0-5)
+    private String mainImg;
+    private String brand;
+    private String category;
+    private String subCategory;
+    private List<String> tags;
+    private int inventoryCount; // Number of items left
+    private List<String> otherImages;
+    private String description;
 
     private List<Spec> specs; // Specifications of the product
+
+    public Product(String name, String category, String subCategory, double price) {
+        this.name = name;
+        this.category = category;
+        this.subCategory = subCategory;
+        this.price = price;
+    }
 
     @Data
     @NoArgsConstructor
