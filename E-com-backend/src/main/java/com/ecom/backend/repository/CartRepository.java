@@ -1,4 +1,4 @@
-package com.ecom.backend.repositoty;
+package com.ecom.backend.repository;
 
 import com.ecom.backend.model.Cart;
 import org.springframework.data.mongodb.repository.MongoRepository;
