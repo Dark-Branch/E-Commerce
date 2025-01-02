@@ -16,19 +16,20 @@ import java.util.List;
 public class Order {
     @Id
     private String id;
-    private String userId; // Reference to User
+    private String userId;
     private List<OrderItem> items;
     private double totalAmount;
-    private String paymentMethod; // E.g., "Credit Card", "PayPal"
-    private String status; // E.g., "Pending", "Shipped", "Delivered"
+    private String paymentMethod; // "Credit Card", "PayPal"
+    private String status; // "Pending", "Shipped", "Delivered"
     private Date createdAt;
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class OrderItem {
-        private String productId; // Reference to Product
+        private String productId;
         private int quantity;
+        private String version;
         private double price; // Price at the time of order
     }
 }
