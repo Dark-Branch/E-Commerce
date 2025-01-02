@@ -1,7 +1,7 @@
 package com.ecom.backend.service;
 
 import com.ecom.backend.model.Order;
-import com.ecom.backend.repositoty.OrderRepository;
+import com.ecom.backend.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

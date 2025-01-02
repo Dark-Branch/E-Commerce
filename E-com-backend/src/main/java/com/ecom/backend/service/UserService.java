@@ -1,7 +1,7 @@
 package com.ecom.backend.service;
 
 import com.ecom.backend.model.User;
-import com.ecom.backend.repositoty.UserRepository;
+import com.ecom.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ public class UserService {
 
     public User updateUser(String userId, User updatedUser) {
         User existingUser = getUserById(userId);
-        existingUser.setUsername(updatedUser.getUsername());
+        existingUser.setUserName(updatedUser.getUserName());
         existingUser.setEmail(updatedUser.getEmail());
         existingUser.setAddress(updatedUser.getAddress());
         return userRepository.save(existingUser);
