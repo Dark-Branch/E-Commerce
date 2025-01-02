@@ -1,8 +1,9 @@
 package com.ecom.backend.service;
 
 import com.ecom.backend.model.Product;
-import com.ecom.backend.repositoty.ProductRepository;
+import com.ecom.backend.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,7 +30,6 @@ public class ProductService {
         existingProduct.setName(updatedProduct.getName());
         existingProduct.setDescription(updatedProduct.getDescription());
         existingProduct.setPrice(updatedProduct.getPrice());
-        existingProduct.setStock(updatedProduct.getStock());
         existingProduct.setCategory(updatedProduct.getCategory());
         return productRepository.save(existingProduct);
     }
