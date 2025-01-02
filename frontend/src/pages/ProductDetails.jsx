@@ -1,5 +1,6 @@
 import React from 'react'
-import Navbar from '../components/Navbar';
+import Topbar from '../components/Topbar';
+import Navbar from "../components/Navbar";
 import Footer from '../components/Footer';
 import ProductDetail from '../components/ProductDetail';
 import FrequentlyViewed from '../components/FrequentlyViewed';
@@ -58,24 +59,21 @@ const reviews = [
   { text: 'Loving it so far!', reviewer: 'User8', date: 'Dec 8, 2024', rating: 5 },
 ];
 
-<TopReviews reviews={reviews} />
-
-
-
 
 const ProductDetails = () => {
   return (
     <div>
-      <Navbar/>
-      <div className="p-4">
-      <ProductDetail product={product} />
-    </div>
-    <FrequentlyViewed items={frequentlyViewed} />
-      <TopReviews reviews={reviews} />
-      <CommentAndRateSection />
+  <Topbar />
+  <Navbar />
+  <div className="p-4 mt-[10px]">
+    <ProductDetail product={product} />
+  </div>
+  <FrequentlyViewed items={frequentlyViewed} />
+  <TopReviews reviews={reviews} />
+  <CommentAndRateSection />
+  <Footer />
+</div>
 
-      <Footer/>
-    </div>
   )
 }
 
