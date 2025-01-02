@@ -22,7 +22,8 @@ public class Cart {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CartItem {
-        private String productId; // Reference to Product
+        private String productId;
         private int quantity;
+        private String version;
     }
 }

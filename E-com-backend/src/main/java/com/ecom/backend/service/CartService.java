@@ -1,7 +1,7 @@
 package com.ecom.backend.service;
 
 import com.ecom.backend.model.Cart;
-import com.ecom.backend.repositoty.CartRepository;
+import com.ecom.backend.repository.CartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +9,15 @@ import org.springframework.stereotype.Service;
 public class CartService {
     @Autowired
     private CartRepository cartRepository;
+
+    // test
+    public Cart getCartById(String id){
+        return cartRepository.findById(id).orElseThrow();
+    }
+
+    public Cart createCart(Cart cart){
+        return cartRepository.save(cart);
+    }
 
     public Cart getCartByUserId(String userId) {
         return cartRepository.findByUserId(userId);
