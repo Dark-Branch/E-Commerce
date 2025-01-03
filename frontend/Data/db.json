@@ -1,0 +1,173 @@
+
+{
+    "productDetais" : [
+        {   
+            "id" : 1,
+            "title" : "Product 1",
+            "rating" : 4.5,
+            "main img" : "https://via.placeholder.com/150",
+            "otherImages" : ["https://via.placeholder.com/150", "https://via.placeholder.com/150"],
+            "brand" : "Brand 1",
+            "description" : "This is a description of product 1",
+            "tags": ["new", "popular", "sale"],
+            "specs" : [
+                {   
+                    "spec" : "color",
+                    "values" : [
+                                {   
+                                    "id": 1, 
+                                    "value" :"Red"
+
+                                }, 
+                                {   
+                                    "id": 2, 
+                                    "value" :"Blue"
+
+                                }
+                            ]
+                },
+                {   
+                    "spec" : "size",
+                    "values" : [
+                                {   
+                                    "id": 1, 
+                                    "value" :"S"
+
+                                }, 
+                                {   
+                                    "id": 2, 
+                                    "value" :"L"
+
+                                },
+                                {   
+                                    "id": 3, 
+                                    "value" :"M"
+                                }
+                            ]
+                }
+            ],
+            "varients" : [
+                {
+                    "id" : 1,
+                    "color" : 1,
+                    "size" : 2,
+                    "inventory" : 5,
+                    "price" : 100,
+                    "Image" : "https://via.placeholder.com/150"
+                },
+                {
+                    "id" : 2,
+                    "color" : 2,
+                    "size" : 3,
+                    "inventory" : 5,
+                    "price" : 100,
+                    "Image" : "https://via.placeholder.com/150"
+                }
+            ],
+            "reviews": [
+                {
+                    "id": 1,
+                    "user": "John Doe",
+                    "rating": 5,
+                    "comment": "Great product!",
+                    "date": "2025-01-01",
+                    "images" : ["https://via.placeholder.com/150", "https://via.placeholder.com/150"]
+                },
+                {
+                    "id": 2,
+                    "user": "Jane Smith",
+                    "rating": 4,
+                    "comment": "Good quality, but a bit expensive.",
+                    "date": "2025-01-02",
+                    "images" : ["https://via.placeholder.com/150", "https://via.placeholder.com/150"]
+                }
+            ],
+            "supplier": {
+                "name": "Supplier 1",
+                "contact": "supplier1@example.com",
+                "address": "123 Main Street, City, Country"
+            },
+            "warranty": {
+                "duration": "1 year",
+                "details": "Covers manufacturing defects only."
+            },
+            "shipping": {
+                "weight": "1kg",
+                "dimensions": "10x10x10 cm",
+                "cost": 5
+            }
+        }
+         
+    ],
+    "cart":[
+                {
+                    "id" : 1,
+                    "title" :"Product 1",
+                    "varientSpecs" : ["Large", "Red"],
+                    "count" : 2,
+                    "price" : 100,
+                    "discountedPrice" : 90,
+                    "seller" : "Seller 1"
+                },
+                {
+                    "id" : 2,
+                    "title" :"Product 2",
+                    "varientSpecs" : ["Small", "Blue"],
+                    "count" : 1,
+                    "price" : 50,
+                    "discountedPrice" : 45,
+                    "seller" : "Seller 2"
+                },
+                {
+                    "id" : 3,
+                    "title" :"Product 3",
+                    "varientSpecs" : ["Medium", "Green"],
+                    "count" : 3,
+                    "price" : 75,
+                    "discountedPrice" : 70,
+                    "seller" : "Seller 3"
+                },
+                {
+                    "id" : 4,
+                    "title" :"Product 4",
+                    "varientSpecs" : ["Small", "Red"],
+                    "count" : 1,
+                    "price" : 50,
+                    "discountedPrice" : 45,
+                    "seller" : "Seller 4"
+                }
+            ],
+    "checkout" :{
+        "itemCount" : 7,
+        "totalDiscount" : 25,
+        "shippingCost" : 5,
+        "total" : 350,
+        "accDetails" : {
+            "name" : "John Doe",
+            "address" : {
+                "no" : "290/3",
+                "street" : "Main Street",
+                "city" : "kiribathgoda",
+                "district" : "gampaha",
+                "province" : "western",
+                "country" : "Sri Lanka"
+                },
+            "contact" : "0771234567",
+            "email" : "example@gmail.com"
+        }
+        
+    },
+    "Topbar":{
+        "cartCount" : 7,
+        "placeHolder" : "Benten watch"
+    },
+    "Navbar":{
+        "categories" : ["Electronics", "Fashion", "Home & Garden", "Health & Beauty", "Toys", "Sports", "Automotive", "Books", "Music", "Movies"]
+    }
+
+
+            
+        
+}
+
+
