@@ -52,7 +52,7 @@ public class CartControllerTest {
 
     @Test
     public void testAddItemToCartByCartId() {
-        Cart.CartItem cartItem = new Cart.CartItem(newProduct.getId(), 2, null);
+        Cart.CartItem cartItem = new Cart.CartItem(newProduct.getId(), 2, null, null);
 
         HttpEntity<Cart.CartItem> request = new HttpEntity<>(cartItem);
 
@@ -72,7 +72,7 @@ public class CartControllerTest {
 
     @Test
     public void testAddExistingItemToCartByCartId() {
-        Cart.CartItem cartItem = new Cart.CartItem(newProduct.getId(), 2, null);
+        Cart.CartItem cartItem = new Cart.CartItem(newProduct.getId(), 2, null, null);
 
         HttpEntity<Cart.CartItem> request = new HttpEntity<>(cartItem);
 
@@ -98,7 +98,7 @@ public class CartControllerTest {
 
     @Test
     public void testAddNonExistingProductToCart() {
-        Cart.CartItem cartItem = new Cart.CartItem("Not an ID", 2, null);
+        Cart.CartItem cartItem = new Cart.CartItem("Not an ID", 2, null, null);
 
         HttpEntity<Cart.CartItem> request = new HttpEntity<>(cartItem);
 
@@ -107,6 +107,5 @@ public class CartControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
-    
 
 }

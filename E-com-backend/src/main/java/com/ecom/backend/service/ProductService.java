@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -65,7 +66,7 @@ public class ProductService {
 
     public boolean isProductInStock(String productId, int requestedQuantity) {
         Product product = productRepository.findById(productId).orElseThrow(
-                () -> new ProductNotFoundException("Product not found")
+                ProductNotFoundException::new
         );
         return product.getInventoryCount() >= requestedQuantity;
     }
@@ -76,6 +77,14 @@ public class ProductService {
         Update update = new Update().inc("inventoryCount", -quantity);
         UpdateResult result = mongoTemplate.updateFirst(query, update, Product.class);
         return result.getModifiedCount() > 0;
+    }
+
+    public double getPriceByProductId(String productId){
+        Optional<Product> product = productRepository.findById(productId);
+        if (product.isPresent()){
+            return product.get().getPrice();
+        }
+        throw new ProductNotFoundException();
     }
 }
 

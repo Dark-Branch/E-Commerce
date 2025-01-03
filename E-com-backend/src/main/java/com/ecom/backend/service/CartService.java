@@ -71,7 +71,7 @@ public class CartService {
         }
 
         if (!itemUpdated) {
-            items.add(new Cart.CartItem(cartItem.getProductId(), cartItem.getQuantity(), cartItem.getVersion()));
+            items.add(new Cart.CartItem(cartItem.getProductId(), cartItem.getQuantity(), cartItem.getVersion(), productService.getPriceByProductId(cartItem.getProductId())));
         }
 
         cart.setItems(items);

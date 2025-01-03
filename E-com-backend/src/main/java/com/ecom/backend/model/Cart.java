@@ -25,6 +25,7 @@ public class Cart {
         private String productId;
         private int quantity;
         private String version;
+        private Double price;
     }
 }
 // TODO: add discounts

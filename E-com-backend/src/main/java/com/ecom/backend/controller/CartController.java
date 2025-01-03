@@ -63,4 +63,5 @@ public class CartController {
 
 /* TODO: when item is available when cart is created, but now item is sold out
     add more items on same type and remove them
+    what to do with price changes
  */
