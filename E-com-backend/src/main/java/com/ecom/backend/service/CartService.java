@@ -49,39 +49,38 @@ public class CartService {
         }
     }
 
-    public void addItemToCart(String userId, String productId, int quantity) {
-        // Check product stock
-        if (!productService.isProductInStock(productId, quantity)) {
+    public void addItemToCart(String cartId, Cart.CartItem cartItem) {
+        // Check  stock
+        // TODO: add bisnas logic
+        if (!productService.isProductInStock(cartItem.getProductId(), cartItem.getQuantity())) {
             throw new RuntimeException("Product is out of stock or requested quantity exceeds available stock");
         }
 
-        // Find the cart for the user
-        Cart cart = cartRepository.findByUserId(userId);
-        if (cart == null)
-            cart = new Cart(null, userId, new ArrayList<>());
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
 
-        // Update or add the item in the cart
         List<Cart.CartItem> items = cart.getItems();
         boolean itemUpdated = false;
 
         for (Cart.CartItem item : items) {
-            if (item.getProductId().equals(productId)) {
-                item.setQuantity(item.getQuantity() + quantity);
+            if (item.getProductId().equals(cartItem.getProductId())) {
+                item.setQuantity(item.getQuantity() + cartItem.getQuantity());
                 itemUpdated = true;
                 break;
             }
         }
 
         if (!itemUpdated) {
-            items.add(new Cart.CartItem(productId, quantity, null));
+            items.add(new Cart.CartItem(cartItem.getProductId(), cartItem.getQuantity(), cartItem.getVersion()));
         }
 
         cart.setItems(items);
         cartRepository.save(cart);
     }
 
+
     public void removeItemFromCart(String userId, String productId) {
-        // Find the cart for the user
+
         Cart cart = cartRepository.findByUserId(userId);
         if (cart == null)
             throw new RuntimeException("Cart not found");

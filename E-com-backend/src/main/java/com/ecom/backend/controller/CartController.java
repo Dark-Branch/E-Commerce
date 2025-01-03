@@ -1,7 +1,6 @@
 package com.ecom.backend.controller;
 
 import com.ecom.backend.model.Cart;
-import com.ecom.backend.model.Product;
 import com.ecom.backend.service.CartService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,9 +46,13 @@ public class CartController {
         return ResponseEntity.created(uri).build();
     }
 
-    @PostMapping("/{userId}")
-    public Cart addToCart(@PathVariable String userId, @RequestBody Cart.CartItem cartItem) {
-        return cartService.addToCart(userId, cartItem);
+    @PatchMapping("/{id}/addItem")
+    public ResponseEntity<Cart> addToCartByCartId(@PathVariable String id, @RequestBody Cart.CartItem cartItem) {
+
+        cartService.addItemToCart(id, cartItem);
+        Cart updatedCart = cartService.getCartById(id);
+
+        return ResponseEntity.ok(updatedCart);
     }
 
     @DeleteMapping("/{userId}")
@@ -57,3 +60,7 @@ public class CartController {
         cartService.clearCart(userId);
     }
 }
+
+/* TODO: when item is available when cart is created, but now item is sold out
+    add more items on same type and remove them
+ */

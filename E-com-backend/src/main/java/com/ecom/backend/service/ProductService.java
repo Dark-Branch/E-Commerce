@@ -1,5 +1,6 @@
 package com.ecom.backend.service;
 
+import com.ecom.backend.exception.ProductNotFoundException;
 import com.ecom.backend.model.Product;
 import com.ecom.backend.repository.ProductRepository;
 import com.mongodb.client.result.UpdateResult;
@@ -64,7 +65,7 @@ public class ProductService {
 
     public boolean isProductInStock(String productId, int requestedQuantity) {
         Product product = productRepository.findById(productId).orElseThrow(
-                () -> new RuntimeException("Product not found")
+                () -> new ProductNotFoundException("Product not found")
         );
         return product.getInventoryCount() >= requestedQuantity;
     }
