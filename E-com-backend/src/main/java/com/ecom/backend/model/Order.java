@@ -1,6 +1,7 @@
 package com.ecom.backend.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -12,6 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Document(collection = "orders")
 public class Order {
     @Id
@@ -22,6 +24,9 @@ public class Order {
     private String paymentMethod; // "Credit Card", "PayPal"
     private String status; // "Pending", "Shipped", "Delivered"
     private Date createdAt;
+    private Date updatedAt;
+    private String address;
+    private String instructions; // to deliver
 
     @Data
     @NoArgsConstructor

@@ -1,5 +1,6 @@
 package com.ecom.backend.service;
 
+import com.ecom.backend.exception.NotFoundException;
 import com.ecom.backend.model.Cart;
 import com.ecom.backend.repository.CartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,15 @@ public class CartService {
 
     // test
     public Cart getCartById(String id){
-        return cartRepository.findById(id).orElseThrow(() -> new RuntimeException("No cart"));
+        return cartRepository.findById(id).orElseThrow(() -> new NotFoundException("Cart not found"));
     }
 
     public Cart createCart(Cart cart){
         return cartRepository.save(cart);
+    }
+
+    public void deleteCart(Cart cart){
+        cartRepository.delete(cart);
     }
 
     public Cart getCartByUserId(String userId) {

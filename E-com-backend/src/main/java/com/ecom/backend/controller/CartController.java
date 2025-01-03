@@ -1,7 +1,10 @@
 package com.ecom.backend.controller;
 
+import com.ecom.backend.DTO.CheckoutRequest;
 import com.ecom.backend.model.Cart;
+import com.ecom.backend.model.Order;
 import com.ecom.backend.service.CartService;
+import com.ecom.backend.service.CheckoutService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +18,12 @@ import java.net.URI;
 @RestController
 @RequestMapping("/cart")
 public class CartController {
+
     @Autowired
     private CartService cartService;
+
+    @Autowired
+    private CheckoutService checkoutService;
 
     private static final Logger logger = LoggerFactory.getLogger(CartController.class);
 
@@ -45,6 +52,15 @@ public class CartController {
         URI uri = ucb.path("/cart/{id}").buildAndExpand(newCart.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
+
+    // transactional ?
+    @PostMapping("/checkout")
+    public ResponseEntity<Order> convertCartToOrder(@RequestBody CheckoutRequest request, UriComponentsBuilder ucb) {
+            Order order = checkoutService.checkoutCart(request);
+            URI uri = ucb.path("/orders/{id}").buildAndExpand(order.getId()).toUri();
+            return ResponseEntity.created(uri).build();
+    }
+
 
     @PatchMapping("/{id}/addItem")
     public ResponseEntity<Cart> addToCartByCartId(@PathVariable String id, @RequestBody Cart.CartItem cartItem) {
