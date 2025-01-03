@@ -1,9 +1,14 @@
 package com.ecom.backend.controller;
 
+import com.ecom.backend.DTO.CheckoutRequest;
 import com.ecom.backend.model.Cart;
-import com.ecom.backend.model.Product;
+import com.ecom.backend.model.Order;
 import com.ecom.backend.service.CartService;
+import com.ecom.backend.service.CheckoutService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -13,16 +18,26 @@ import java.net.URI;
 @RestController
 @RequestMapping("/cart")
 public class CartController {
+
     @Autowired
     private CartService cartService;
 
+    @Autowired
+    private CheckoutService checkoutService;
+
+    private static final Logger logger = LoggerFactory.getLogger(CartController.class);
+
     @GetMapping("/{id}")
     public ResponseEntity<Cart> getCartById(@PathVariable String id){
-        Cart cart = cartService.getCartById(id);
-        if (cart != null) {
+        Cart cart;
+        try {
+            cart = cartService.getCartById(id);
             return ResponseEntity.ok(cart);
-        } else {
+        } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
+        }catch (Exception e) {
+            logger.error("Internal server error: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 //  this is the real one
@@ -38,9 +53,22 @@ public class CartController {
         return ResponseEntity.created(uri).build();
     }
 
-    @PostMapping("/{userId}")
-    public Cart addToCart(@PathVariable String userId, @RequestBody Cart.CartItem cartItem) {
-        return cartService.addToCart(userId, cartItem);
+    // transactional ?
+    @PostMapping("/checkout")
+    public ResponseEntity<Order> convertCartToOrder(@RequestBody CheckoutRequest request, UriComponentsBuilder ucb) {
+            Order order = checkoutService.checkoutCart(request);
+            URI uri = ucb.path("/orders/{id}").buildAndExpand(order.getId()).toUri();
+            return ResponseEntity.created(uri).build();
+    }
+
+
+    @PatchMapping("/{id}/addItem")
+    public ResponseEntity<Cart> addToCartByCartId(@PathVariable String id, @RequestBody Cart.CartItem cartItem) {
+
+        cartService.addItemToCart(id, cartItem);
+        Cart updatedCart = cartService.getCartById(id);
+
+        return ResponseEntity.ok(updatedCart);
     }
 
     @DeleteMapping("/{userId}")
@@ -48,3 +76,8 @@ public class CartController {
         cartService.clearCart(userId);
     }
 }
+
+/* TODO: when item is available when cart is created, but now item is sold out
+    add more items on same type and remove them
+    what to do with price changes
+ */

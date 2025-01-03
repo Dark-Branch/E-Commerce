@@ -16,14 +16,20 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable String userId) {
-        List<Order> orders = orderService.getOrdersByUserId(userId);
-        if (orders.isEmpty()) {
-            return ResponseEntity.ok(orders);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+//    @GetMapping("/{userId}")
+//    public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable String userId) {
+//        List<Order> orders = orderService.getOrdersByUserId(userId);
+//        if (orders.isEmpty()) {
+//            return ResponseEntity.ok(orders);
+//        } else {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Order> getOrderById(@PathVariable String id) {
+        Order order = orderService.getOrderById(id);
+        return ResponseEntity.ok(order);
     }
 
     @PostMapping
