@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Topbar from "../components/Topbar";
-import Navbar from "../components/Navbar";
 
 const ShoppingCartPage = () => {
   const [cartItems, setCartItems] = useState([
@@ -32,11 +31,11 @@ const ShoppingCartPage = () => {
 
   return (
     <>
-      <header >
-          <Topbar/>
-          <Navbar/>
+      <header className="sticky top-0 z-50">
+        <Topbar />
       </header>
-    <div className="min-h-screen bg-white absolute w-full flex justify-center items-center">
+
+      <div className="min-h-screen bg-white flex justify-center items-center pt-[5px]">
       <div className="bg-gray-100 container m-10 rounded-md shadow-md ">
         <h1 className="text-3xl  pl-5 pt-6 mb-4">Shopping Cart</h1>
         <div className="mx-5">
@@ -70,7 +69,7 @@ const ShoppingCartPage = () => {
                     -
                   </button>
                 </div>
-                <button className="text-blue-600 text-sm bg-gray-200 p-2 rounded-md m-2">Buy it now</button>
+                <button className="text-blue-600 text-sm bg-gray-200 p-2 rounded-md m-2">Buy now</button>
                 <button
                   onClick={() => removeItem(item.id)}
                   className="text-red-600 text-sm  bg-gray-200 p-2 rounded-md m-2"

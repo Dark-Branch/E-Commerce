@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -8,7 +8,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 text-gray-900 sticky top-0 z-50 ">
+    <nav className="bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 text-gray-900 sticky top-0 z-50">
       <div className="max-w-screen-xl mx-auto flex flex-wrap md:flex-nowrap text-sm items-center justify-between py-2 px-4">
         <div className="flex items-center">
           <button onClick={toggleMobileMenu} className="md:hidden text-gray-900 p-2">
@@ -38,75 +38,66 @@ const Navbar = () => {
           </button>
         </div>
 
-        <div className={`w-full md:w-auto flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-6 ${isMobileMenuOpen ? 'flex' : 'hidden md:flex'}`}>
-          
+        <div
+          className={`w-full md:w-auto flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-6 ${
+            isMobileMenuOpen ? "flex" : "hidden md:flex"
+          }`}
+        >
           <div className="relative group">
             <a href="#" className="hover:bg-gray-200 px-4 py-2 rounded-md inline-block">
               Explore (New!)
             </a>
           </div>
-
-          {/* Repeat this structure for other dropdowns */}
           <div className="relative group">
             <a href="#" className="hover:bg-gray-200 px-4 py-2 rounded-md inline-block">
               Electronics
             </a>
-         
           </div>
           <div className="relative group">
             <a href="#" className="hover:bg-gray-200 px-4 py-2 rounded-md inline-block">
               Motors
             </a>
-           
           </div>
           <div className="relative group">
             <a href="#" className="hover:bg-gray-200 px-4 py-2 rounded-md inline-block">
               Fashion
             </a>
-          
           </div>
           <div className="relative group">
             <a href="#" className="hover:bg-gray-200 px-4 py-2 rounded-md inline-block">
               Collectibles & Art
             </a>
-          
           </div>
           <div className="relative group">
             <a href="#" className="hover:bg-gray-200 px-4 py-2 rounded-md inline-block">
               Sports
             </a>
-            
           </div>
           <div className="relative group">
             <a href="#" className="hover:bg-gray-200 px-4 py-2 rounded-md inline-block">
               Health & Beauty
             </a>
-           
           </div>
           <div className="relative group">
             <a href="#" className="hover:bg-gray-200 px-4 py-2 rounded-md inline-block">
               Industrial equipment
             </a>
-           
           </div>
           <div className="relative group">
             <a href="#" className="hover:bg-gray-200 px-4 py-2 rounded-md inline-block">
               Home & Garden
             </a>
           </div>
-
           <div>
-          <a href="#" className="hover:bg-gray-200 px-4 py-2 rounded-md inline-block">
-            Deals
-          </a>
+            <a href="#" className="hover:bg-gray-200 px-4 py-2 rounded-md inline-block">
+              Deals
+            </a>
           </div>
-
           <div>
-          <a href="#" className="hover:bg-gray-200 px-4 py-2 rounded-md inline-block">
-            Sell
-          </a>
+            <a href="#" className="hover:bg-gray-200 px-4 py-2 rounded-md inline-block">
+              Sell
+            </a>
           </div>
-
         </div>
       </div>
     </nav>
