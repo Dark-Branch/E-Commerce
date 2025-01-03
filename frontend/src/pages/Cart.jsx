@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Topbar from "../components/Topbar";
+
 import Navbar from "../components/Navbar";
 import delimg from "../assets/delete-svgrepo-com.svg";
 import LoadingImg from "../assets/Flowing gradient.gif"
 import { useNavigate} from "react-router-dom";
+
+
 
 const ShoppingCartPage = () => {
   // const [cartItems, setCartItems] = useState([
@@ -57,11 +60,11 @@ const ShoppingCartPage = () => {
 
   return (
     <>
-      <header >
-          <Topbar/>
-          <Navbar/>
+      <header className="sticky top-0 z-50">
+        <Topbar />
       </header>
-    <div className="min-h-screen bg-white absolute w-full flex justify-center items-center">
+
+      <div className="min-h-screen bg-white flex justify-center items-center pt-[5px]">
       <div className="bg-gray-100 container m-10 rounded-md shadow-md ">
         
         <h1 className="text-3xl  pl-5 pt-6 mb-4">Shopping Cart</h1>

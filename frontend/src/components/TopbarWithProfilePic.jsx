@@ -1,10 +1,8 @@
 import cart from '../assets/cart-shopping-fast-svgrepo-com.svg';
-import Ecom from '../assets/cart-svgrepo-com.svg';
 import Logo from '../assets/logo.png';
 import search from '../assets/search-alt-2-svgrepo-com.svg';
-
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useState,useEffect } from 'react';
 
 const Topbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -13,35 +11,13 @@ const Topbar = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const [cartCount,setCartCount] = useState(null);
-  const [placeholder,setPlaceholder] = useState(null);
-  const [searchValue,setSearchValue] = useState(null);
-
-  const handleSearch = ({value}) =>{
-    setSearchValue(value)
-  }
-
-  useEffect(()=>{
-    fetch('http://localhost:8000/Topbar')
-      .then(res=> 
-      {
-        return res.json();
-      })
-      .then(
-        data =>{
-          setCartCount(data.cartCount);
-          setPlaceholder(data.placeHolder);
-      })
-  },[])
- 
   return (
+    <header className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-4 sticky top-0 z-50">
 
-    <header className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-4 sticky top-0 ">
       <div className=" flex items-center relative ">
-
         {/* Left: Logo */}
         <div className="flex items-center">
-          <Link to="/">
+          <Link to="/"> 
             <img src={Logo} alt="Logo" className="h-12 w-auto" />
           </Link>
         </div>
@@ -50,33 +26,35 @@ const Topbar = () => {
         <div className="flex-grow mx-4 hidden md:flex justify-center items-center">
           <input
             type="text"
-            placeholder={placeholder}
-            value = {searchValue}
-            onChange={handleSearch}
-            className="w-full max-w-lg p-2 px-5  rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            placeholder="Search..."
+            className="w-full max-w-lg p-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
-          <button className="flex items-center bg-white p-2 rounded-full w-9 mx-3">
-            <img src={search} alt="Search Icon" />
-          </button>
+          <button className="flex items-center  bg-white p-2 rounded-full w-9  mx-3">
+              <img src={search}/>
+          </button >
         </div>
 
         {/* Right: Login, Signup, and Cart */}
-        <div className="absolute right-0 flex space-x-4 md:space-x-6">
-          <div className="hidden md:flex items-center space-x-4">
-            <Link to="/login" className="text-white px-4 py-2 rounded-md hover:bg-purple-600 transition-colors duration-300">
-              Login
-            </Link>
-            <Link to="/signup" className="text-white px-4 py-2 rounded-md hover:bg-purple-600 transition-colors duration-300">
-              Sign Up
-            </Link>
-          </div>
+        <div className="absolute right-0 flex  space-x-4 md:space-x-6">
 
-          <Link to="/cart" className="text-white text-2xl relative">
+            <div className="hidden md:flex items-center space-x-4">
+                <a href="/profile" className="flex items-center space-x-2">
+                <img
+                    src="https://via.placeholder.com/40" // Replace this with the actual profile picture URL
+                    alt="User Profile"
+                    className="w-10 h-10 rounded-full object-cover"
+                />
+                </a>
+            </div>
+
+
+          <a href="/cart" className="text-white text-2xl relative">
             <img src={cart} alt="Cart" className="h-8 w-auto hidden md:flex" />
+            {/* Optional: Add a cart count badge */}
             <span className="hidden md:flex absolute top-0 right-0 items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
-              {cartCount || 0}
+              3
             </span>
-          </Link>
+          </a>
 
           {/* Mobile Menu Toggle */}
           <button onClick={toggleMobileMenu} className="md:hidden text-white">
@@ -110,20 +88,22 @@ const Topbar = () => {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-purple-300 p-4 flex flex-col items-center">
-          <div className="flex items-center space-x-2 bg-white p-2 rounded-full w-full mb-4">
+          <div>
             <input
               type="text"
-              placeholder="Search..."
-              className="flex-grow p-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              placeholder="search..."
+              className="w-full mb-4 p-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
-            <img src={search} alt="Search Icon" />
+            <div className="flex items-center space-x- bg-white p-2 rounded-full">
+              <img src={search}/>
+            </div>
           </div>
-          <Link to="/login" className="text-white w-full text-center py-2 rounded-md hover:bg-purple-600 transition-colors duration-300 mb-2">
+          <a href="/login" className="text-white w-full text-center py-2 rounded-md hover:bg-purple-600 transition-colors duration-300 mb-2">
             Login
-          </Link>
-          <Link to="/signup" className="text-white w-full text-center py-2 rounded-md hover:bg-purple-600 transition-colors duration-300">
+          </a>
+          <a href="/signup" className="text-white w-full text-center py-2 rounded-md hover:bg-purple-600 transition-colors duration-300">
             Sign Up
-          </Link>
+          </a>
         </div>
       )}
     </header>

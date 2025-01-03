@@ -71,6 +71,7 @@ const CheckoutPage = () => {
 
   return (
     <>
+
       
       <header >
           <Topbar/>
@@ -189,6 +190,12 @@ const CheckoutPage = () => {
         </form>
       </Model>
 
+
+
+       <header className="sticky top-0 z-50">
+        <Topbar />
+      </header>
+      
 
       <div className="min-h-screen bg-gray-100 flex  items-center">
       
