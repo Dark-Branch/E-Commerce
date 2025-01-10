@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,7 +43,14 @@ public class CartControllerTest {
         product.setInventoryCount(20);
         newProduct = productRepository.save(product);
 
-        existingCart = new Cart(null, "testUserId", new ArrayList<>());
+        Date date = new Date();
+        existingCart = Cart.builder()
+                .userName("testUserId")
+                .active(true)
+                .items(new ArrayList<>())
+                .createdAt(date)
+                .updatedAt(date)
+                .build();
         existingCart = cartRepository.save(existingCart);
     }
 

@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CartRepository extends MongoRepository<Cart, String> {
-    Cart findByUserName(String userId);
+    Cart findByUserName(String userName);
 }
 // TODO: do the refractors related to change of userid to user name
