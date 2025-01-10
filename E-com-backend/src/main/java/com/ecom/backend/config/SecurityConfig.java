@@ -30,8 +30,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/api/auth/**").permitAll() // Allow unauthenticated access to authentication endpoints
-//                .anyRequest().permitAll())// Requires authentication for all other requests
+                .requestMatchers("/api/auth/**").permitAll()
+//                .anyRequest().permitAll())
                 .anyRequest().authenticated())// Requires authentication for all other requests
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(CsrfConfigurer::disable);

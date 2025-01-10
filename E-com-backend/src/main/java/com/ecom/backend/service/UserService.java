@@ -38,23 +38,24 @@ public class UserService implements UserDetailsService {
         try {
             return userRepository.insert(user);
         } catch (DuplicateKeyException e) {
-            throw new IllegalArgumentException("User with this userId already exists");
+            throw new IllegalArgumentException("User with this userName already exists");
         }
     }
+    // TODO: this error
 
-    public User getUserById(String userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+    public User getUserByName(String userName) {
+        return userRepository.findByUserName(userName).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    public User updateUser(String userId, User updatedUser) {
-        User existingUser = getUserById(userId);
+    public User updateUser(String userName, User updatedUser) {
+        User existingUser = getUserByName(userName);
         existingUser.setUserName(updatedUser.getUserName());
         existingUser.setEmail(updatedUser.getEmail());
         existingUser.setAddress(updatedUser.getAddress());
         return userRepository.save(existingUser);
     }
 
-    public void deleteUser(String userId) {
-        userRepository.deleteById(userId);
+    public void deleteUser(String userName) {
+        userRepository.deleteByUserName(userName);
     }
 }
