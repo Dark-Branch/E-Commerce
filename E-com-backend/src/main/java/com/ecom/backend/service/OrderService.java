@@ -17,10 +17,14 @@ public class OrderService {
         return orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Order Not Found"));
     }
 
-    public List<Order> getOrdersByUserId(String userId) {
-        return orderRepository.findByUserId(userId);
+    public List<Order> getOrdersByUserName(String userName) {
+        return orderRepository.findByUserName(userName);
     }
 
+//    public Order confirmOrder(String id){
+//        Order order = getOrderById(id);
+//
+//    }
     public Order createOrder(Order order) {
         return orderRepository.save(order);
     }

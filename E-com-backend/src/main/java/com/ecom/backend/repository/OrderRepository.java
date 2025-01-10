@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface OrderRepository extends MongoRepository<Order, String> {
-    List<Order> findByUserId(String userId);
+    List<Order> findByUserName(String userName);
 }
+// TODO: do the refractors related to change of userid to user name
