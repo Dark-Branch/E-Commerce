@@ -18,7 +18,7 @@ import java.util.List;
 public class Order {
     @Id
     private String id;
-    private String userId;
+    private String userName;
     private List<OrderItem> items;
     private double totalAmount;
     private String paymentMethod; // "Credit Card", "PayPal"

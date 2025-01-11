@@ -62,6 +62,7 @@ public class AuthControllerTest {
         assertEquals(HttpStatus.OK, getResponse.getStatusCode());
         assertEquals("User registered successfully", getResponse.getBody());
 
+        userHere.setRole(null);
         ResponseEntity<String> response = restTemplate.postForEntity(baseUrl + "/login", userHere, String.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -93,3 +94,5 @@ public class AuthControllerTest {
         assertEquals("Invalid username or password", response.getBody());
     }
 }
+
+// TODO: handle duplicate user error

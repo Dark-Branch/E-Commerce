@@ -1,7 +1,6 @@
 package com.ecom.backend.service;
 
 import com.ecom.backend.DTO.CheckoutRequest;
-import com.ecom.backend.exception.ProductNotFoundException;
 import com.ecom.backend.model.Cart;
 import com.ecom.backend.model.Order;
 import com.ecom.backend.model.Product;
@@ -32,7 +31,7 @@ public class CheckoutService {
         Order order = Order.builder().paymentMethod(request.getPaymentMethod())
                 .status("Pending")
                 .instructions(request.getInstructions())
-                .userId(cart.getUserId()) // use token later
+                .userName(cart.getUserName()) // TODO: use token later
                 .createdAt(date)
                 .updatedAt(date)
                 .address(request.getAddress())

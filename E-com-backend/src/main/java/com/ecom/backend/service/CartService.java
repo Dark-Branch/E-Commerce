@@ -3,10 +3,8 @@ package com.ecom.backend.service;
 import com.ecom.backend.exception.NotFoundException;
 import com.ecom.backend.model.Cart;
 import com.ecom.backend.repository.CartRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,22 +30,22 @@ public class CartService {
         cartRepository.delete(cart);
     }
 
-    public Cart getCartByUserId(String userId) {
-        return cartRepository.findByUserId(userId);
+    public Cart getCartByUserName(String userName) {
+        return cartRepository.findByUserName(userName);
     }
 
-    public Cart addToCart(String userId, Cart.CartItem cartItem) {
-        Cart cart = cartRepository.findByUserId(userId);
+    public Cart addToCart(String userName, Cart.CartItem cartItem) {
+        Cart cart = cartRepository.findByUserName(userName);
         if (cart == null) {
             cart = new Cart();
-            cart.setUserId(userId);
+            cart.setUserName(userName);
         }
         cart.getItems().add(cartItem);
         return cartRepository.save(cart);
     }
 
-    public void clearCart(String userId) {
-        Cart cart = cartRepository.findByUserId(userId);
+    public void clearCart(String userName) {
+        Cart cart = cartRepository.findByUserName(userName);
         if (cart != null) {
             cart.getItems().clear();
             cartRepository.save(cart);
@@ -84,9 +82,9 @@ public class CartService {
     }
 
 
-    public void removeItemFromCart(String userId, String productId) {
+    public void removeItemFromCart(String userName, String productId) {
 
-        Cart cart = cartRepository.findByUserId(userId);
+        Cart cart = cartRepository.findByUserName(userName);
         if (cart == null)
             throw new RuntimeException("Cart not found");
 
@@ -98,3 +96,4 @@ public class CartService {
         cartRepository.save(cart);
     }
 }
+// TODO: handle cartBuilder, using createdAt and UpdatedAt

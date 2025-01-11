@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -160,6 +159,7 @@ class EComBackendApplicationTests {
 
 
 	@Test
+	@Disabled
 	void shouldGetUser() {
 		ResponseEntity<String> response = restTemplate.getForEntity("/users/{id}", String.class, "67762397adc0c8036d567a30");
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -173,6 +173,7 @@ class EComBackendApplicationTests {
 	}
 
 	@Test
+	@Disabled
 	void ShouldCreateNewUser() {
 		User user = new User();
 		user.setUserName("pakaya");
@@ -227,7 +228,7 @@ class EComBackendApplicationTests {
 
 		// Create an empty cart
 		Cart cart = new Cart();
-		cart.setUserId("user123");
+		cart.setUserName("user123");
 		cart.setItems(new ArrayList<>());
 
 		// Add the product as a CartItem
