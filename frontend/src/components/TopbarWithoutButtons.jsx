@@ -1,4 +1,3 @@
-import cart from '../assets/cart-shopping-fast-svgrepo-com.svg';
 import Logo from '../assets/logo.png';
 import search from '../assets/search-alt-2-svgrepo-com.svg';
 
@@ -45,29 +44,10 @@ const Topbar = () => {
           </button>
         </div>
 
-        {/* Right: Login, Signup, and Cart (hidden on small screens) */}
-        <div className="hidden md:flex space-x-4 items-center">
-          <Link
-            to="/login"
-            className="text-white px-4 py-2 rounded-md hover:bg-purple-600 transition-colors duration-300"
-          >
-            Login
-          </Link>
-          <Link
-            to="/signup"
-            className="text-white px-4 py-2 rounded-md hover:bg-purple-600 transition-colors duration-300"
-          >
-            Sign Up
-          </Link>
-          <Link to="/cart" className="text-white text-2xl relative">
-            <img src={cart} alt="Cart" className="h-8 w-auto" />
-          </Link>
-        </div>
+       
       </div>
     </header>
   );
 };
 
 export default Topbar;
-
-

@@ -8,7 +8,10 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 text-gray-900 sticky top-0 z-50">
+    <nav
+      className="bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 text-gray-900 z-50"
+      style={{ position: "sticky", top: "80px" }} // Adjust `top` based on the height of the component above
+    >
       <div className="max-w-screen-xl mx-auto flex flex-wrap md:flex-nowrap text-sm items-center justify-between py-2 px-4">
         <div className="flex items-center">
           <button onClick={toggleMobileMenu} className="md:hidden text-gray-900 p-2">
