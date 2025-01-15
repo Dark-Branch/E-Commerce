@@ -6,7 +6,6 @@ import com.ecom.backend.repository.ProductRepository;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -14,7 +13,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +42,7 @@ public class ProductService {
                 PageRequest.of(page, limit));
     }
 
-    public List<Document> searchProducts(String name, String category, Double minPrice, Double maxPrice, String sortBy, String sortOrder) {
+    public List<Product> searchProducts(String name, String category, Double minPrice, Double maxPrice, String sortBy, String sortOrder) {
 
         Query query = new Query();
 
@@ -56,14 +54,22 @@ public class ProductService {
         if (category != null) {
             query.addCriteria(Criteria.where("category").is(category));
         }
-        if (minPrice != null) {
-            query.addCriteria(Criteria.where("price").gte(minPrice));
-        }
-        if (maxPrice != null) {
-            query.addCriteria(Criteria.where("price").lte(maxPrice));
+
+        // specially wrote this query because prev method didnt work when two criteria for one field not worked
+        if (minPrice != null || maxPrice != null) {
+            Document priceQuery = new Document();
+
+            if (minPrice != null) {
+                priceQuery.put("$gte", minPrice);
+            }
+            if (maxPrice != null) {
+                priceQuery.put("$lte", maxPrice);
+            }
+
+            query.addCriteria(Criteria.where("price").is(priceQuery));
         }
 
-        // sorting
+        // sort
         if ("price".equalsIgnoreCase(sortBy)) {
             query.with(org.springframework.data.domain.Sort.by(
                     "asc".equalsIgnoreCase(sortOrder) ?
@@ -80,7 +86,7 @@ public class ProductService {
             ));
         }
 
-        return mongoTemplate.find(query, Document.class, "products");
+        return mongoTemplate.find(query, Product.class, "products");
     }
 
     public Product createProduct(Product product) {
