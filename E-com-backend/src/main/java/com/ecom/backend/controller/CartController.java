@@ -30,22 +30,17 @@ public class CartController {
     @GetMapping("/{id}")
     public ResponseEntity<Cart> getCartById(@PathVariable String id){
         Cart cart;
-        try {
-            cart = cartService.getCartById(id);
-            return ResponseEntity.ok(cart);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }catch (Exception e) {
-            logger.error("Internal server error: ", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+        cart = cartService.getCartById(id);
+        return ResponseEntity.ok(cart);
     }
+
 //  this is the real one
 //    @GetMapping("/{userId}")
 //    public Cart getCartByUserId(@PathVariable String userId) {
 //        return cartService.getCartByUserId(userId);
 //    }
 
+    // TODO: remove if no use
     @PostMapping
     public ResponseEntity<Void> createCart(@RequestBody Cart cart, UriComponentsBuilder ucb){
         Cart newCart =  cartService.createCart(cart);
@@ -61,14 +56,14 @@ public class CartController {
             return ResponseEntity.created(uri).build();
     }
 
+    // FIXME: for now i get userId from client -> change when implementing security
+    @PostMapping("/add")
+    public ResponseEntity<String> addToCartByCartId(@RequestBody Cart.CartItem cartItem,
+                                                  @RequestParam(required = false) String userId,
+                                                  @RequestParam(required = false) String sessionId) {
 
-    @PatchMapping("/{id}/addItem")
-    public ResponseEntity<Cart> addToCartByCartId(@PathVariable String id, @RequestBody Cart.CartItem cartItem) {
-
-        cartService.addItemToCart(id, cartItem);
-        Cart updatedCart = cartService.getCartById(id);
-
-        return ResponseEntity.ok(updatedCart);
+        cartService.addItemToCart(userId, sessionId, cartItem);
+        return ResponseEntity.ok("Item added to cart");
     }
 
     @DeleteMapping("/{userId}")

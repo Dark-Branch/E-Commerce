@@ -228,7 +228,7 @@ class EComBackendApplicationTests {
 
 		// Create an empty cart
 		Cart cart = new Cart();
-		cart.setUserName("user123");
+		cart.setUserId("user123");
 		cart.setItems(new ArrayList<>());
 
 		// Add the product as a CartItem
