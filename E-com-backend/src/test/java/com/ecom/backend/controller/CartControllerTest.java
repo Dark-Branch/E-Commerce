@@ -8,6 +8,7 @@ import com.ecom.backend.repository.CartRepository;
 import com.ecom.backend.repository.ProductRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,7 +46,7 @@ public class CartControllerTest {
 
         Date date = new Date();
         existingCart = Cart.builder()
-                .userName("testUserId")
+                .userId("testUserId")
                 .active(true)
                 .items(new ArrayList<>())
                 .createdAt(date)
@@ -61,18 +62,23 @@ public class CartControllerTest {
     }
 
     @Test
-    public void testAddItemToCartByCartId() {
+    public void testAddItemToCartByUserId() {
         Cart.CartItem cartItem = new Cart.CartItem(newProduct.getId(), 2, null, null);
 
         HttpEntity<Cart.CartItem> request = new HttpEntity<>(cartItem);
 
-        ResponseEntity<Cart> response = restTemplate.exchange("/cart/{id}/addItem", HttpMethod.PATCH,
-                request, Cart.class, existingCart.getId());
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/cart/add?userId={userId}",
+                HttpMethod.POST,
+                request,
+                String.class,
+                existingCart.getUserId()
+        );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo("Item added to cart");
 
-        Cart updatedCart = response.getBody();
-        assertThat(updatedCart).isNotNull();
+        Cart updatedCart = cartRepository.findByUserId(existingCart.getUserId()).orElseThrow();
         assertThat(updatedCart.getItems()).hasSize(1);
 
         Cart.CartItem addedItem = updatedCart.getItems().get(0);
@@ -81,29 +87,36 @@ public class CartControllerTest {
     }
 
     @Test
-    public void testAddExistingItemToCartByCartId() {
+    public void testAddExistingItemToCartByUserId() {
         Cart.CartItem cartItem = new Cart.CartItem(newProduct.getId(), 2, null, null);
 
         HttpEntity<Cart.CartItem> request = new HttpEntity<>(cartItem);
 
-        ResponseEntity<Cart> response = restTemplate.exchange("/cart/{id}/addItem", HttpMethod.PATCH,
-                request, Cart.class, existingCart.getId());
+        restTemplate.exchange(
+                "/cart/add?userId={userId}",
+                HttpMethod.POST,
+                request,
+                String.class,
+                existingCart.getUserId()
+        );
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/cart/add?userId={userId}",
+                HttpMethod.POST,
+                request,
+                String.class,
+                existingCart.getUserId()
+        );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo("Item added to cart");
 
-        response = restTemplate.exchange("/cart/{id}/addItem", HttpMethod.PATCH,
-                request, Cart.class, existingCart.getId());
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        Cart updatedCart = response.getBody();
-        assertThat(updatedCart).isNotNull();
+        Cart updatedCart = cartRepository.findByUserId(existingCart.getUserId()).orElseThrow();
         assertThat(updatedCart.getItems()).hasSize(1);
 
         Cart.CartItem addedItem = updatedCart.getItems().get(0);
         assertThat(addedItem.getProductId()).isEqualTo(newProduct.getId());
-        // added two times
-        assertThat(addedItem.getQuantity()).isEqualTo(4);
+        assertThat(addedItem.getQuantity()).isEqualTo(4); // Added twice
     }
 
     @Test
@@ -112,10 +125,46 @@ public class CartControllerTest {
 
         HttpEntity<Cart.CartItem> request = new HttpEntity<>(cartItem);
 
-        ResponseEntity<String> response = restTemplate.exchange("/cart/{id}/addItem", HttpMethod.PATCH,
-                request, String.class, existingCart.getId());
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/cart/add?userId={userId}",
+                HttpMethod.POST,
+                request,
+                String.class,
+                existingCart.getUserId()
+        );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    @Disabled   // TODO: implement session
+    public void testAddItemToCartBySessionId() {
+        // Prepare the cart item
+        Cart.CartItem cartItem = new Cart.CartItem(newProduct.getId(), 2, null, null);
+
+        // Prepare the request
+        HttpEntity<Cart.CartItem> request = new HttpEntity<>(cartItem);
+
+        // Call the endpoint with a session ID
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/cart/add?sessionId={sessionId}",
+                HttpMethod.POST,
+                request,
+                String.class,
+                "testSessionId"
+        );
+
+        // Assert the response
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo("Item added to cart");
+
+        // Verify the cart was updated
+        Cart updatedCart = cartRepository.findBySessionId("testSessionId").orElseThrow();
+        assertThat(updatedCart.getItems()).hasSize(1);
+
+        Cart.CartItem addedItem = updatedCart.getItems().get(0);
+        assertThat(addedItem.getProductId()).isEqualTo(newProduct.getId());
+        assertThat(addedItem.getQuantity()).isEqualTo(2);
     }
 
     @Test
