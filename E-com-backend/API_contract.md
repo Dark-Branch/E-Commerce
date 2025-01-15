@@ -27,8 +27,12 @@
 - create cart
   - post /cart
   - body - cart
+  - returns new cart uri
 - get cart
   - get /cart/{id}
+- update cart
+  - patch /cart/{id}/addItem
+  - body - cartItem
 
 ### Orders /orders
 - get orders of user
