@@ -1,7 +1,7 @@
 package com.ecom.backend.service;
+import com.ecom.backend.exception.NotFoundException;
 import com.ecom.backend.model.User;
 import com.ecom.backend.repository.UserRepository;
-import com.mongodb.DuplicateKeyException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -35,13 +35,8 @@ public class UserService implements UserDetailsService {
     }
 
     public User createUser(User user) {
-        try {
-            return userRepository.insert(user);
-        } catch (DuplicateKeyException e) {
-            throw new IllegalArgumentException("User with this userName already exists");
-        }
+        return userRepository.save(user);
     }
-    // TODO: this error
 
     public User getUserByName(String userName) {
         return userRepository.findByUserName(userName).orElseThrow(() -> new RuntimeException("User not found"));
@@ -57,5 +52,9 @@ public class UserService implements UserDetailsService {
 
     public void deleteUser(String userName) {
         userRepository.deleteByUserName(userName);
+    }
+
+    public User getUserById(String userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
     }
 }

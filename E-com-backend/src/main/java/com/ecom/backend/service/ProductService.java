@@ -4,6 +4,7 @@ import com.ecom.backend.exception.ProductNotFoundException;
 import com.ecom.backend.model.Product;
 import com.ecom.backend.repository.ProductRepository;
 import com.mongodb.client.result.UpdateResult;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -41,6 +42,45 @@ public class ProductService {
     public Page<Product> getProductsOfCategoryAndSubCategory(String category, String subCategory, int page, int limit) {
         return productRepository.findByCategoryAndSubCategory(category, subCategory,
                 PageRequest.of(page, limit));
+    }
+
+    public List<Document> searchProducts(String name, String category, Double minPrice, Double maxPrice, String sortBy, String sortOrder) {
+
+        Query query = new Query();
+
+        // FIXME: for now, only use regex, change this
+        // TODO: use tags, categories also for search
+        if (name != null) {
+            query.addCriteria(Criteria.where("name").regex(name, "i")); // Case-insensitive search
+        }
+        if (category != null) {
+            query.addCriteria(Criteria.where("category").is(category));
+        }
+        if (minPrice != null) {
+            query.addCriteria(Criteria.where("price").gte(minPrice));
+        }
+        if (maxPrice != null) {
+            query.addCriteria(Criteria.where("price").lte(maxPrice));
+        }
+
+        // sorting
+        if ("price".equalsIgnoreCase(sortBy)) {
+            query.with(org.springframework.data.domain.Sort.by(
+                    "asc".equalsIgnoreCase(sortOrder) ?
+                            org.springframework.data.domain.Sort.Direction.ASC :
+                            org.springframework.data.domain.Sort.Direction.DESC,
+                    "price"
+            ));
+        } else if ("name".equalsIgnoreCase(sortBy)) {
+            query.with(org.springframework.data.domain.Sort.by(
+                    "asc".equalsIgnoreCase(sortOrder) ?
+                            org.springframework.data.domain.Sort.Direction.ASC :
+                            org.springframework.data.domain.Sort.Direction.DESC,
+                    "name"
+            ));
+        }
+
+        return mongoTemplate.find(query, Document.class, "products");
     }
 
     public Product createProduct(Product product) {

@@ -2,6 +2,7 @@ package com.ecom.backend.controller;
 
 import com.ecom.backend.model.Product;
 import com.ecom.backend.service.ProductService;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,20 @@ public class ProductController {
     }
     // FIXME: do i need to split category and subcategory into two endpoints
 
-    // sellers only
+    @GetMapping("/search")
+    public ResponseEntity<List<Document>> searchProducts(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false, defaultValue = "name") String sortBy,
+            @RequestParam(required = false, defaultValue = "asc") String sortOrder) {
+
+        List<Document> products = productService.searchProducts(name, category, minPrice, maxPrice, sortBy, sortOrder);
+        return ResponseEntity.ok(products);
+    }
+
+    // TODO: make this sellers only
     @PostMapping
     public ResponseEntity<Void> createProduct(@RequestBody Product product, UriComponentsBuilder ucb) {
 
@@ -105,3 +119,4 @@ public class ProductController {
     }
 
 // TODO: update product things
+// TODO: limit the data return relevant to each request
