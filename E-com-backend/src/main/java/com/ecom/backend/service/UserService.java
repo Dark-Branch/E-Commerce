@@ -1,4 +1,5 @@
 package com.ecom.backend.service;
+import com.ecom.backend.exception.NotFoundException;
 import com.ecom.backend.model.User;
 import com.ecom.backend.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,8 +34,8 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    public void createUser(User user) {
-        userRepository.insert(user);
+    public User createUser(User user) {
+        return userRepository.save(user);
     }
 
     public User getUserByName(String userName) {
@@ -51,5 +52,9 @@ public class UserService implements UserDetailsService {
 
     public void deleteUser(String userName) {
         userRepository.deleteByUserName(userName);
+    }
+
+    public User getUserById(String userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
     }
 }

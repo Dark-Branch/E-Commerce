@@ -31,8 +31,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/api/auth/**").permitAll()
-//                .anyRequest().permitAll())
-                .anyRequest().authenticated())// Requires authentication for all other requests
+                .anyRequest().permitAll())
+//                .anyRequest().authenticated())// Requires authentication for all other requests
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(CsrfConfigurer::disable);
         return http.build();

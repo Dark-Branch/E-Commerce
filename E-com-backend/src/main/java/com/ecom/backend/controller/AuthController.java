@@ -50,7 +50,7 @@ public class AuthController {
         }
     }
 
-    @DeleteMapping
+    @DeleteMapping // FIXME: does this belong to user controller or user controller
     public ResponseEntity<Void> removeUser(Principal principal){
         String currentUsername = principal.getName();
         if (currentUsername == null || currentUsername.isEmpty()) {
