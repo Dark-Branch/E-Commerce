@@ -44,23 +44,14 @@ public class CartController {
         return ResponseEntity.created(uri).build();
     }
 
-    // transactional ?
-    @PostMapping("/checkout")
-    public ResponseEntity<Order> convertCartToOrder(@RequestBody CheckoutRequest request,
-                                                    UriComponentsBuilder ucb, Principal principal) {
-        Order order = checkoutService.checkoutCart(request);
-        URI uri = ucb.path("/orders/{id}").buildAndExpand(order.getId()).toUri();
-        return ResponseEntity.created(uri).build();
-    }
-
     // FIXME: for now i get userId from client -> change when implementing security
+
     @PostMapping("/{cartId}/add")
     public ResponseEntity<String> addItemToCart(@PathVariable String cartId,
                                                 @RequestBody Cart.CartItem cartItem) {
         cartService.addItemToCart(cartId, cartItem);
         return ResponseEntity.ok("Item added to cart");
     }
-
     @PostMapping("/{cartId}/remove")
     public ResponseEntity<String> removeItemFromCart(@PathVariable String cartId,
                                                      @RequestParam String productId) {
@@ -72,6 +63,15 @@ public class CartController {
     public ResponseEntity<String> clearCart(@PathVariable String cartId) {
         cartService.clearCart(cartId);
         return ResponseEntity.ok("Cart cleared");
+    }
+
+    // transactional ?
+    @PostMapping("/checkout")
+    public ResponseEntity<Void> convertCartToOrder(@RequestBody CheckoutRequest request,
+                                                    UriComponentsBuilder ucb, Principal principal) {
+        Order order = checkoutService.checkoutCart(request);
+        URI uri = ucb.path("/orders/{id}").buildAndExpand(order.getId()).toUri();
+        return ResponseEntity.created(uri).build();
     }
 }
 

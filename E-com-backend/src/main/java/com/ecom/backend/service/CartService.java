@@ -132,5 +132,16 @@ public class CartService {
                 .build();
         return cartRepository.save(newCart);
     }
+
+    public Cart updateCart(Cart cart) {
+
+        if (!cartRepository.existsById(cart.getId())) {
+            throw new NotFoundException("Cart not found with ID: " + cart.getId());
+        }
+
+        cart.setUpdatedAt(new Date());
+
+        return cartRepository.save(cart);
+    }
 }
 // TODO: handle cartBuilder, using createdAt and UpdatedAt
