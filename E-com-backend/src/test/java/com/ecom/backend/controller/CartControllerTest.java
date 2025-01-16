@@ -347,35 +347,4 @@ public class CartControllerTest {
         assertThat(updatedCart.getItems()).isEmpty();
     }
 
-    @Test
-    @Disabled
-    void testCheckoutCart() {
-        CheckoutRequest checkoutRequest = new CheckoutRequest(existingCart.getId(), null, "Credit Card", null);
-
-        // add item to cart
-        Cart.CartItem cartItem = new Cart.CartItem(newProduct.getId(), 2, null, null);
-        HttpEntity<Cart.CartItem> request = new HttpEntity<>(cartItem);
-        ResponseEntity<Cart> cartResponse = restTemplate.exchange("/cart/{id}/addItem", HttpMethod.PATCH,
-                request, Cart.class, existingCart.getId());
-        assertThat(cartResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        ResponseEntity<Order> response = restTemplate.postForEntity(
-                "/cart/checkout",
-                checkoutRequest,
-                Order.class
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(response.getBody()).isNull();
-
-        ResponseEntity<Order> orderResponse = restTemplate.getForEntity(response.getHeaders().getLocation(), Order.class);
-
-        assertThat(orderResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(orderResponse.getBody().getTotalAmount()).isEqualTo(newProduct.getPrice() * 2);
-        assertThat(orderResponse.getBody().getPaymentMethod()).isEqualTo("Credit Card");
-        assertThat(orderResponse.getBody().getStatus()).isEqualTo("Pending");
-        assertThat(orderResponse.getBody().getItems().size()).isEqualTo(1);
-        assertThat(orderResponse.getBody().getItems().get(0).getProductId()).isEqualTo(newProduct.getId());
-    }
-
 }

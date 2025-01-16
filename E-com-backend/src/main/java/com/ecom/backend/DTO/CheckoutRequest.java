@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 public class CheckoutRequest {
@@ -12,4 +14,5 @@ public class CheckoutRequest {
     private String address;
     private String paymentMethod;
     private String instructions;
+    private List<Cart.CartItem> selectedItems;
 }
