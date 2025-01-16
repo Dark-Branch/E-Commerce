@@ -31,7 +31,7 @@ public class CheckoutService {
         Order order = Order.builder().paymentMethod(request.getPaymentMethod())
                 .status("Pending")
                 .instructions(request.getInstructions())
-                .userName(cart.getUserName()) // TODO: use token later
+                .userName(cart.getUserId()) // TODO: use token later
                 .createdAt(date)
                 .updatedAt(date)
                 .address(request.getAddress())
