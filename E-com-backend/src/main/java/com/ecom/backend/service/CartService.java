@@ -62,26 +62,7 @@ public class CartService {
 //            throw new RuntimeException("Product is out of stock or requested quantity exceeds available stock");
 //        }
 
-        Cart cart;
-        if (userId != null) {
-            // registered users -> find cart by userId
-            cart = cartRepository.findByUserId(userId)
-                    .orElseGet(() -> {
-                        Cart newCart = new Cart();
-                        newCart.setUserId(userId);
-                        return cartRepository.save(newCart);
-                    });
-        } else if (sessionId != null) {
-            // guest -> find cart by sessionId
-            cart = cartRepository.findBySessionId(sessionId)
-                    .orElseGet(() -> {
-                        Cart newCart = new Cart();
-                        newCart.setSessionId(sessionId);
-                        return cartRepository.save(newCart);
-                    });
-        } else {
-            throw new RuntimeException("Either userId or sessionId must be provided");
-        }
+        Cart cart = getCart(userId, sessionId);
 
         List<Cart.CartItem> items = cart.getItems();
         boolean itemUpdated = false;
@@ -114,6 +95,35 @@ public class CartService {
                 .toList());
 
         cartRepository.save(cart);
+    }
+
+    public Cart getOrCreateCart(String userId, String sessionId) {
+        Cart cart = getCart(userId, sessionId);
+        return cart;
+    }
+
+    private Cart getCart(String userId, String sessionId) {
+        Cart cart;
+        if (userId != null) {
+            // registered users -> find cart by userId
+            cart = cartRepository.findByUserId(userId)
+                    .orElseGet(() -> {
+                        Cart newCart = new Cart();
+                        newCart.setUserId(userId);
+                        return cartRepository.save(newCart);
+                    });
+        } else if (sessionId != null) {
+            // guest -> find cart by sessionId
+            cart = cartRepository.findBySessionId(sessionId)
+                    .orElseGet(() -> {
+                        Cart newCart = new Cart();
+                        newCart.setSessionId(sessionId);
+                        return cartRepository.save(newCart);
+                    });
+        } else {
+            throw new RuntimeException("Either userId or sessionId must be provided");
+        }
+        return cart;
     }
 }
 // TODO: handle cartBuilder, using createdAt and UpdatedAt
