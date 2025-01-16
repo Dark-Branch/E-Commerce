@@ -234,7 +234,7 @@ public class CartControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getUserId()).isEqualTo(newUserId);
-        assertThat(response.getBody().getItems()).isNull();// no items
+        assertThat(response.getBody().getItems()).isEmpty();
     }
 
     @Test
@@ -251,7 +251,105 @@ public class CartControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getSessionId()).isEqualTo(newSessionId);
-        assertThat(response.getBody().getItems()).isNull(); // no items
+        assertThat(response.getBody().getItems()).isEmpty();
+    }
+
+    @Test
+    void removeItemFromCart_WithUserId_RemovesItem() {
+        String userId = existingCart.getUserId();
+        Cart.CartItem item = new Cart.CartItem(newProduct.getId(), 1, null, newProduct.getPrice());
+        existingCart.getItems().add(item);
+        cartRepository.save(existingCart);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/cart/remove?userId=" + userId + "&productId=" + newProduct.getId(),
+                HttpMethod.POST,
+                null,
+                String.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo("Item removed from cart");
+
+        Cart updatedCart = cartRepository.findById(existingCart.getId()).orElseThrow();
+        assertThat(updatedCart.getItems()).isEmpty();
+    }
+
+    @Test
+    void removeItemFromCart_WithSessionId_RemovesItem() {
+        String sessionId = "testSessionId";
+        Cart guestCart = Cart.builder()
+                .sessionId(sessionId)
+                .active(true)
+                .items(new ArrayList<>())
+                .createdAt(new Date())
+                .updatedAt(new Date())
+                .build();
+        Cart.CartItem item = new Cart.CartItem(newProduct.getId(), 1, null, newProduct.getPrice());
+        guestCart.getItems().add(item);
+        cartRepository.save(guestCart);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/cart/remove?sessionId=" + sessionId + "&productId=" + newProduct.getId(),
+                HttpMethod.POST,
+                null,
+                String.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo("Item removed from cart");
+
+        Cart updatedCart = cartRepository.findById(guestCart.getId()).orElseThrow();
+        assertThat(updatedCart.getItems()).isEmpty();
+    }
+
+    @Test
+    void removeItemFromCart_WithNonExistentProductId_ThrowsNotFoundException() {
+        String userId = existingCart.getUserId();
+        String nonExistentProductId = "nonExistentProductId";
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/cart/remove?userId=" + userId + "&productId=" + nonExistentProductId,
+                HttpMethod.POST,
+                null,
+                String.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).contains("Item not found in cart");
+    }
+
+    @Test
+    void removeItemFromCart_WithNonExistentCart_ThrowsNotFoundException() {
+        String nonExistentUserId = "nonExistentUserId";
+        String productId = newProduct.getId();
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/cart/remove?userId=" + nonExistentUserId + "&productId=" + productId,
+                HttpMethod.POST,
+                null,
+                String.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        // manage error in way cart not found error is not shown to users, if cart is N/A make a cart
+//        assertThat(response.getBody()).contains("Cart not found");
+        assertThat(response.getBody()).contains("Item not found in cart");
+    }
+
+    @Test
+    void removeItemFromCart_WithNeitherUserIdNorSessionId_ThrowsBadRequest() {
+        String productId = newProduct.getId();
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/cart/remove?productId=" + productId,
+                HttpMethod.POST,
+                null,
+                String.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).contains("Either userId or sessionId must be provided");
     }
 
     @Test
