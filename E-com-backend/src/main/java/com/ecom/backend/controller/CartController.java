@@ -38,8 +38,8 @@ public class CartController {
 
     // TODO: remove if no use
     @PostMapping
-    public ResponseEntity<Void> createCart(@RequestBody Cart cart, UriComponentsBuilder ucb){
-        Cart newCart =  cartService.createCart(cart);
+    public ResponseEntity<Void> createCart(UriComponentsBuilder ucb) {
+        Cart newCart =  cartService.createCart();
         URI uri = ucb.path("/cart/{id}").buildAndExpand(newCart.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
@@ -47,33 +47,31 @@ public class CartController {
     // transactional ?
     @PostMapping("/checkout")
     public ResponseEntity<Order> convertCartToOrder(@RequestBody CheckoutRequest request,
-                                                    UriComponentsBuilder ucb, Principal principal){
+                                                    UriComponentsBuilder ucb, Principal principal) {
         Order order = checkoutService.checkoutCart(request);
         URI uri = ucb.path("/orders/{id}").buildAndExpand(order.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
 
     // FIXME: for now i get userId from client -> change when implementing security
-    @PostMapping("/add")
-    public ResponseEntity<String> addItemToCart(@RequestBody Cart.CartItem cartItem,
-                                                @RequestParam(required = false) String userId,
-                                                @RequestParam(required = false) String sessionId){
-
-        cartService.addItemToCart(userId, sessionId, cartItem);
+    @PostMapping("/{cartId}/add")
+    public ResponseEntity<String> addItemToCart(@PathVariable String cartId,
+                                                @RequestBody Cart.CartItem cartItem) {
+        cartService.addItemToCart(cartId, cartItem);
         return ResponseEntity.ok("Item added to cart");
     }
 
-    @PostMapping("/remove")
-    public ResponseEntity<String> removeItemFromCart(@RequestParam String productId,
-                                                     @RequestParam(required = false) String userId,
-                                                     @RequestParam(required = false) String sessionId){
-        cartService.removeItemFromCart(userId, sessionId, productId);
+    @PostMapping("/{cartId}/remove")
+    public ResponseEntity<String> removeItemFromCart(@PathVariable String cartId,
+                                                     @RequestParam String productId) {
+        cartService.removeItemFromCart(cartId, productId);
         return ResponseEntity.ok("Item removed from cart");
     }
 
-    @DeleteMapping("/{userId}")
-    public void clearCart(@PathVariable String userId) {
-        cartService.clearCart(userId);
+    @DeleteMapping("/{cartId}")
+    public ResponseEntity<String> clearCart(@PathVariable String cartId) {
+        cartService.clearCart(cartId);
+        return ResponseEntity.ok("Cart cleared");
     }
 }
 
