@@ -42,6 +42,13 @@ public class Product {
         this.sellerId = sellerId;
     }
 
+    public Product(String name, String category, String subCategory, double price) {
+        this.name = name;
+        this.category = category;
+        this.subCategory = subCategory;
+        this.price = price;
+    }
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
