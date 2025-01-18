@@ -1,6 +1,8 @@
 package com.ecom.backend.service;
 
 import com.ecom.backend.DTO.CheckoutRequest;
+import com.ecom.backend.exception.NotEnoughStockException;
+import com.ecom.backend.exception.NotFoundException;
 import com.ecom.backend.model.Cart;
 import com.ecom.backend.model.Order;
 import com.ecom.backend.model.Product;
@@ -23,15 +25,22 @@ public class CheckoutService {
     @Autowired
     private ProductService productService;
 
+
     public Order checkoutCart(CheckoutRequest request) {
+
         Cart cart = cartService.getCartById(request.getCartID());
+
+        if (request.getSelectedItems() == null || request.getSelectedItems().isEmpty()) {
+            throw new IllegalArgumentException("No items selected for checkout");
+        }
 
         Date date = new Date();
 
-        Order order = Order.builder().paymentMethod(request.getPaymentMethod())
+        Order order = Order.builder()
+                .paymentMethod(request.getPaymentMethod())
                 .status("Pending")
                 .instructions(request.getInstructions())
-                .userName(cart.getUserName()) // TODO: use token later
+                .userName(cart.getUserId()) // TODO: use token later
                 .createdAt(date)
                 .updatedAt(date)
                 .address(request.getAddress())
@@ -40,19 +49,39 @@ public class CheckoutService {
         double totalAmount = 0;
 
         List<Order.OrderItem> orderItems = new ArrayList<>();
-        for (Cart.CartItem cartItem : cart.getItems()) {
-            Product product = productService.getProductById(cartItem.getProductId());
-            // FIXME: do i need to add product id in error message
+
+        for (Cart.CartItem selectedItem : request.getSelectedItems()) {
+            // Check item is in the cart first - not so needed - for integrity
+            Cart.CartItem cartItem = cart.getItems().stream()
+                    .filter(item -> item.getProductId().equals(selectedItem.getProductId()))
+                    .findFirst()
+                    .orElseThrow(() -> new NotFoundException("Product " + selectedItem.getProductId() + " not found in cart"));
+
+            // FIXME: check with cart, needed?
+            if (selectedItem.getQuantity() > cartItem.getQuantity()) {
+                throw new IllegalArgumentException("Requested quantity for product " + selectedItem.getProductId() + " exceeds available quantity in cart");
+            }
+
+            Product product = productService.getProductById(selectedItem.getProductId());
+
+            // available in stock?
+            if (product.getInventoryCount() < selectedItem.getQuantity()) {
+                throw new NotEnoughStockException("Product " + product.getId() + " is out of stock or quantity exceeds available stock");
+            }
 
             Order.OrderItem orderItem = new Order.OrderItem(
-                    cartItem.getProductId(),
-                    cartItem.getQuantity(),  // TODO: add reduce inventory logic
-                    cartItem.getVersion(),
-                    product.getPrice()      //  price at the time of order placement
+                    selectedItem.getProductId(),
+                    selectedItem.getQuantity(),
+                    selectedItem.getVersion(),
+                    product.getPrice() // Price at the time of order placement
             );
             orderItems.add(orderItem);
 
-            totalAmount += product.getPrice() * cartItem.getQuantity();
+            totalAmount += product.getPrice() * selectedItem.getQuantity();
+
+            // FIXME: not doing this here, because this is just initializing order, this step will be after confirming payment
+//            product.setInventoryCount(product.getInventoryCount() - selectedItem.getQuantity());
+//            productService.updateProduct(product.getId());
         }
 
         order.setItems(orderItems);
@@ -60,7 +89,27 @@ public class CheckoutService {
 
         orderService.createOrder(order);
 
-        cartService.deleteCart(cart);
+        // Remove selected items from the cart or update their quantities
+        List<Cart.CartItem> remainingItems = new ArrayList<>();
+        for (Cart.CartItem cartItem : cart.getItems()) {
+            request.getSelectedItems().stream()
+                    .filter(selectedItem -> selectedItem.getProductId().equals(cartItem.getProductId()))
+                    .findFirst()
+                    .ifPresentOrElse(
+                            selectedItem -> {
+                                // reduce quantity
+                                int remainingQuantity = cartItem.getQuantity() - selectedItem.getQuantity();
+                                if (remainingQuantity > 0) {
+                                    cartItem.setQuantity(remainingQuantity);
+                                    remainingItems.add(cartItem);
+                                }
+                            },
+                            () -> remainingItems.add(cartItem) // others left untouched
+                    );
+        }
+
+        cart.setItems(remainingItems);   // TODO: wht to do to active incative field in cart
+        cartService.updateCart(cart);
 
         return order;
     }
