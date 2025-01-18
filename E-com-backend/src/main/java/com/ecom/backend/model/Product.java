@@ -27,14 +27,17 @@ public class Product {
     private int inventoryCount; // Number of items left
     private List<String> otherImages;
     private String description;
+    private String sellerId;
 
     private List<Spec> specs; // Specifications of the product
 
-    public Product(String name, String category, String subCategory, double price) {
+    public Product(String name, String category, String subCategory, double price, String sellerId , int inventoryCount) {
         this.name = name;
         this.category = category;
         this.subCategory = subCategory;
         this.price = price;
+        this.sellerId = sellerId;
+        this.inventoryCount = inventoryCount;
     }
 
     @Data

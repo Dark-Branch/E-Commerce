@@ -40,7 +40,7 @@ public class CartControllerTest {
 
     @BeforeEach
     void setUp() {
-        Product product = new Product("Test Product", "Category", "SubCategory", 10.0);
+        Product product = new Product("Test Product", "Category", "SubCategory", 10.0, "0006" , 9);
         product.setInventoryCount(20);
         newProduct = productRepository.save(product);
 
