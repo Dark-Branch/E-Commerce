@@ -57,6 +57,10 @@ jobs:
     permissions:
       contents: write
 
+    defaults:
+      run:
+        working-directory: E-com-backend
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
