@@ -33,20 +33,13 @@ public class Product {
 
     private List<Spec> specs; // Specifications of the product
 
-    public Product(String name, String category, String subCategory, double price , int inventoryCount , String sellerId) {
+    public Product(String name, String category, String subCategory, double price, String sellerId , int inventoryCount) {
         this.name = name;
         this.category = category;
         this.subCategory = subCategory;
         this.price = price;
-        this.inventoryCount = inventoryCount;
         this.sellerId = sellerId;
-    }
-
-    public Product(String name, String category, String subCategory, double price) {
-        this.name = name;
-        this.category = category;
-        this.subCategory = subCategory;
-        this.price = price;
+        this.inventoryCount = inventoryCount;
     }
 
     @Data

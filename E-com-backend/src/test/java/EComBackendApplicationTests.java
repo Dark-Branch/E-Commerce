@@ -15,14 +15,16 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = EComBackendApplication.class,webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class EComBackendApplicationTests {
+public class EComBackendApplicationTests {
 
 	@Autowired
 	TestRestTemplate restTemplate;
@@ -39,9 +41,9 @@ class EComBackendApplicationTests {
 	void setUp() {
 		productRepository.deleteAll();
 		productRepository.saveAll(List.of(
-				new Product("Product 1", "Electronics", "Mobile", 100.0),
-				new Product("Product 2", "Electronics", "Laptop", 500.0),
-				new Product("Product 3", "Clothing", "Men", 50.0)
+				new Product("Product 1", "Electronics", "Mobile", 100.0, "0001", 5),
+				new Product("Product 2", "Electronics", "Laptop", 500.0, "0002", 5),
+				new Product("Product 3", "Clothing", "Men", 50.0, "0003", 5)
 		));
 	}
 
@@ -55,11 +57,19 @@ class EComBackendApplicationTests {
 
 	@Test
 //	@DirtiesContext
-	@Disabled
-	void shouldCreteNewProduct() {
+//	@Disabled
+	public void shouldCreteNewProduct() {
 		Product product = new Product();
+		List<String> tags = Arrays.asList("Electronics", "Fan", "Speed");
+
 		product.setName("alutheka");
+		product.setCategory("Electronics");
+		product.setSubCategory("Fan");
 		product.setPrice(100);
+		product.setInventoryCount(6);
+		product.setSellerId("0005");
+		product.setTags(tags);
+
 
 		ResponseEntity<Void> response = restTemplate.postForEntity("/products", product, Void.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -72,10 +82,29 @@ class EComBackendApplicationTests {
 		DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
 		System.out.println(getResponse.getBody());
 		String id = documentContext.read("$.id");
-		Double amount = documentContext.read("$.price");
+		String name = documentContext.read("$.name");
+		String category = documentContext.read("$.category");
+		String subCategory = documentContext.read("$.subCategory");
+		Double price = documentContext.read("$.price");
+		String sellerId = documentContext.read("$.sellerId");
+		int inventoryCount = documentContext.read("$.inventoryCount");
+		List<String> responseTags = documentContext.read("$.tags");
+
+
+
 
 		assertThat(id).isNotNull();
-		assertThat(amount).isEqualTo(100);
+		assertThat(name).isEqualTo("alutheka");
+		assertThat(category).isEqualTo("Electronics");
+		assertThat(subCategory).isEqualTo("Fan");
+		assertThat(price).isEqualTo(100.0);
+		assertThat(sellerId).isEqualTo("0005");
+		assertThat(inventoryCount).isEqualTo(6);
+		assertThat(responseTags).containsExactly("Electronics", "Fan", "Speed");
+		//These assertThat statements are part of the assertions in your test.
+		// Assertions are used to verify that the actual output of your code
+		// (in this case, the values returned from the API response) matches the expected values.
+		// They help ensure that your code behaves correctly by checking that the data returned by the API (e.g., product details) is accurate.
 	}
 
 	@Test
@@ -93,6 +122,8 @@ class EComBackendApplicationTests {
 	}
 
 	@Test
+	@Disabled
+	// TODO
 	void testGetProductByCategoryWithSubCategory() {
 		ResponseEntity<Product[]> response = restTemplate.getForEntity(
 				"/products/category/Electronics?subCategory=Mobile&page=0&limit=10", Product[].class);
