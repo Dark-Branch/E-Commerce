@@ -1,4 +1,4 @@
-name: Java CI with Gradle
+name: Dependency submission
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ../E-com-backend
+        working-directory: E-com-backend
 
     steps:
     - uses: actions/checkout@v4
@@ -29,7 +29,7 @@ jobs:
       run: pwd
 
     - name: Debug - List files in current directory
-      run: ls -la
+      run: cd ..
 
     # Generates and submits a dependency graph, enabling Dependabot Alerts for all project dependencies.
     # See: https://github.com/gradle/actions/blob/main/dependency-submission/README.md
