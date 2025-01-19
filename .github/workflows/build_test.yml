@@ -57,9 +57,9 @@ jobs:
     permissions:
       contents: write
 
-    defaults:
-      run:
-        working-directory: E-com-backend
+    # defaults:
+    #   run:
+    #     working-directory: E-com-backend
 
     steps:
     - uses: actions/checkout@v4
