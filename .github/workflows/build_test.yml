@@ -20,6 +20,10 @@ jobs:
     permissions:
       contents: read
 
+    defaults:
+      run:
+        working-directory: E-commerce/E-com-backend
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
@@ -27,10 +31,6 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-
-    # Change working directory to E-com-backend
-    - name: Change to E-com-backend directory
-      run: cd E-com-backend
 
     # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
     # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
@@ -47,7 +47,7 @@ jobs:
     #   uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
     #   with:
     #     gradle-version: '8.9'
-    #
+    
     # - name: Build with Gradle 8.9
     #   run: gradle build
 
@@ -64,10 +64,6 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-
-    # Change working directory to E-com-backend
-    - name: Change to E-com-backend directory
-      run: cd E-com-backend
 
     # Generates and submits a dependency graph, enabling Dependabot Alerts for all project dependencies.
     # See: https://github.com/gradle/actions/blob/main/dependency-submission/README.md
