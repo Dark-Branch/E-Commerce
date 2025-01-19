@@ -28,6 +28,10 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    # Change working directory to E-com-backend
+    - name: Change to E-com-backend directory
+      run: cd E-com-backend
+
     # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
     # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
     - name: Setup Gradle
@@ -60,6 +64,10 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+
+    # Change working directory to E-com-backend
+    - name: Change to E-com-backend directory
+      run: cd E-com-backend
 
     # Generates and submits a dependency graph, enabling Dependabot Alerts for all project dependencies.
     # See: https://github.com/gradle/actions/blob/main/dependency-submission/README.md
