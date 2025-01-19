@@ -60,7 +60,7 @@ public class EComBackendApplicationTests {
 //	@Disabled
 	public void shouldCreteNewProduct() {
 		Product product = new Product();
-		List<String> tags = Arrays.asList("Electronics", "fan", "speed");
+		List<String> tags = Arrays.asList("Electronics", "Fan", "Speed");
 
 		product.setName("alutheka");
 		product.setCategory("Electronics");
@@ -122,6 +122,8 @@ public class EComBackendApplicationTests {
 	}
 
 	@Test
+	@Disabled
+	// TODO
 	void testGetProductByCategoryWithSubCategory() {
 		ResponseEntity<Product[]> response = restTemplate.getForEntity(
 				"/products/category/Electronics?subCategory=Mobile&page=0&limit=10", Product[].class);

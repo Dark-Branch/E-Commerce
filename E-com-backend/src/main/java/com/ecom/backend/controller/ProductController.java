@@ -3,6 +3,7 @@ package com.ecom.backend.controller;
 import com.ecom.backend.model.Product;
 import com.ecom.backend.service.ProductService;
 import org.slf4j.Logger;
+import org.bson.Document;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

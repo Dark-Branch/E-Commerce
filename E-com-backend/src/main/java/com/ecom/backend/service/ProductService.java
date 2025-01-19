@@ -50,7 +50,6 @@ public class ProductService {
 
     public List<Document> searchProducts(String name, String category, String subCategory, List<String> tags, Double minPrice, Double maxPrice, String sortBy, String sortOrder) {
 
-
         Query query = new Query(); //A new Query object is created. This object is used to build the query for fetching data from the MongoDB database.
 
         // FIXME: for now, only use regex, change this
@@ -68,7 +67,7 @@ public class ProductService {
         if (tags != null && !tags.isEmpty()) {
             // Search products where any of the provided tags match
             query.addCriteria(Criteria.where("tags").in(tags)); // The "in" method finds products whose tags contain any of the provided tags.
-
+        }
         // specially wrote this query because prev method didnt work when two criteria for one field not worked
         if (minPrice != null || maxPrice != null) {
             Document priceQuery = new Document();
@@ -102,10 +101,12 @@ public class ProductService {
 
         return mongoTemplate.find(query, Document.class, "products"); //The constructed query is executed using mongoTemplate.find(), which fetches the documents (products) that match the query criteria from the products collection in MongoDB.
     }
+
 //    Summary of How This Method Works:
 //    Filters: The method dynamically adds filtering conditions to the query based on the provided parameters (e.g., name, category, minPrice, maxPrice).
 //    Sorting: It applies sorting based on either price or name and the sorting direction (asc or desc).
 //    Query Execution: The mongoTemplate executes the query and returns the matching products.
+
 
     public Product createProduct(Product product) {
         return productRepository.save(product);
@@ -208,6 +209,7 @@ public class ProductService {
         throw new ProductNotFoundException();
     }
 }
+
 
 // TODO: do we use enum for category
 // add paging with sorting
