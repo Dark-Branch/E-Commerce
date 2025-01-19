@@ -2,7 +2,6 @@ package com.ecom.backend.controller;
 
 import com.ecom.backend.model.Product;
 import com.ecom.backend.service.ProductService;
-import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +83,7 @@ public class ProductController {
 
 
     @GetMapping("/search")
-    public ResponseEntity<List<Document>> searchProducts(
+    public ResponseEntity<?> searchProducts(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String subcategory,
@@ -94,7 +93,9 @@ public class ProductController {
             @RequestParam(required = false, defaultValue = "name") String sortBy,
             @RequestParam(required = false, defaultValue = "asc") String sortOrder) {
 
+
         List<Document> products = productService.searchProducts(name, category, subcategory, tag, minPrice, maxPrice, sortBy, sortOrder);
+      
         return ResponseEntity.ok(products);
     }
 

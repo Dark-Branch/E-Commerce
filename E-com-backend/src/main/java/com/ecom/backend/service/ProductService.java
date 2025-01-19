@@ -6,7 +6,6 @@ import com.ecom.backend.repository.ProductRepository;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -14,16 +13,21 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ProductService {
-    @Autowired
+
     private ProductRepository productRepository;
 
+    @Autowired
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    @Autowired
     private MongoTemplate mongoTemplate;
 
     public ProductService(MongoTemplate mongoTemplate){
@@ -46,6 +50,7 @@ public class ProductService {
 
     public List<Document> searchProducts(String name, String category, String subCategory, List<String> tags, Double minPrice, Double maxPrice, String sortBy, String sortOrder) {
 
+
         Query query = new Query(); //A new Query object is created. This object is used to build the query for fetching data from the MongoDB database.
 
         // FIXME: for now, only use regex, change this
@@ -59,19 +64,26 @@ public class ProductService {
         if (subCategory != null) {
             query.addCriteria(Criteria.where("category").is(subCategory));
         }
-        if (minPrice != null) {
-            query.addCriteria(Criteria.where("price").gte(minPrice)); //gte (Greater Than or Equal To):
-        }
-        if (maxPrice != null) {
-            query.addCriteria(Criteria.where("price").lte(maxPrice)); //lte (Less Than or Equal To):
-        }
         // Check if the 'tags' parameter is provided
         if (tags != null && !tags.isEmpty()) {
             // Search products where any of the provided tags match
             query.addCriteria(Criteria.where("tags").in(tags)); // The "in" method finds products whose tags contain any of the provided tags.
+
+        // specially wrote this query because prev method didnt work when two criteria for one field not worked
+        if (minPrice != null || maxPrice != null) {
+            Document priceQuery = new Document();
+
+            if (minPrice != null) {
+                priceQuery.put("$gte", minPrice);
+            }
+            if (maxPrice != null) {
+                priceQuery.put("$lte", maxPrice);
+            }
+
+            query.addCriteria(Criteria.where("price").is(priceQuery));
         }
 
-        // sorting
+        // sort
         if ("price".equalsIgnoreCase(sortBy)) {
             query.with(org.springframework.data.domain.Sort.by( //Sort.by(): It accepts a direction (Sort.Direction.ASC or Sort.Direction.DESC) and the field name (either "price" or "name") to sort by.
                     "asc".equalsIgnoreCase(sortOrder) ?

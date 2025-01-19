@@ -1,55 +1,215 @@
 package com.ecom.backend.controller;
 
 import com.ecom.backend.model.Product;
+import com.ecom.backend.repository.ProductRepository;
 import com.ecom.backend.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.bson.Document;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
+import java.net.URI;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.mockito.ArgumentMatchers.any;
 
-@WebMvcTest(ProductController.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ProductControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc; // Autowired MockMvc for controller testing
-
-    @MockitoBean
-    private ProductService productService; // Mocked ProductService to be injected into the controller
+    @LocalServerPort
+    private int port; // Inject the random port number
 
     @Autowired
-    private ObjectMapper objectMapper; // Autowired ObjectMapper for converting objects to JSON
+    private TestRestTemplate restTemplate;
+
+    @Autowired
+    ProductRepository productRepository;
+
+    private String baseUrl;
+
+    @BeforeEach
+    void setUp() {
+        baseUrl = "/products";
+        productRepository.deleteAll();
+    }
 
     @Test
-    @Disabled
+//    @Disabled
     void testCreateProduct() throws Exception {
-        // Given: Create a sample product
+        // create product, then check if it is created
         Product product = new Product();
-        product.setId("123456");
         product.setName("Wireless Bluetooth Headphones");
         product.setPrice(59.99);
         product.setRating(4.5);
         product.setMainImg("https://example.com/images/headphones-main.jpg");
         product.setInventoryCount(15);
 
-        // Mock the service method (what happens when the controller calls it)
-        when(productService.createProduct(any(Product.class))).thenReturn(product);
+        ResponseEntity<Product> response = restTemplate.postForEntity("/products", product, Product.class);
 
-        // When and Then: Perform the POST request to the endpoint
-        mockMvc.perform(post("/products")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(product))) // Convert product to JSON
-                .andExpect(status().isCreated()) // Expect a 201 Created status
-                .andExpect(jsonPath("$.id").value("123456")) // Check the ID in the response
-                .andExpect(jsonPath("$.name").value("Wireless Bluetooth Headphones")) // Check name
-                .andExpect(jsonPath("$.price").value(59.99)); // Check price
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+
+        HttpHeaders headers = response.getHeaders();
+        URI location = headers.getLocation();
+        assert location != null;
+
+        ResponseEntity<Product> getResponse = restTemplate.getForEntity(location, Product.class);
+
+        assertEquals(HttpStatus.OK, getResponse.getStatusCode());
+        assertEquals("Wireless Bluetooth Headphones", getResponse.getBody().getName());
+        assertEquals(59.99, getResponse.getBody().getPrice());
+    }
+
+    @Test
+    void testGetProductByCategory() {
+        Product product = Product.builder()
+                .id("1")
+                .name("Smartphone")
+                .price(599.99)
+                .rating(4.5)
+                .category("electronics")
+                .subCategory("mobile")
+                .inventoryCount(50)
+                .mainImg("image_url")
+                .build();
+        productRepository.save(product);
+
+        ResponseEntity<List<Product>> response = restTemplate.exchange(
+                baseUrl + "/category/electronics?page=0&limit=10",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {}
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
+        assertEquals("Smartphone", response.getBody().get(0).getName());
+    }
+
+    @Test
+    void testSearchProductsUsingName() {
+        Product product1 = Product.builder()
+                .id("1")
+                .name("Smartphone")
+                .price(599.99)
+                .rating(4.5)
+                .category("electronics")
+                .subCategory("mobile")
+                .inventoryCount(50)
+                .mainImg("image_url")
+                .build();
+
+        Product product2 = Product.builder()
+                .id("2")
+                .name("Laptop")
+                .price(999.99)
+                .rating(4.7)
+                .category("electronics")
+                .subCategory("computers")
+                .inventoryCount(20)
+                .mainImg("image_url")
+                .build();
+
+        productRepository.saveAll(List.of(product1, product2));
+
+        ResponseEntity<List<Product>> response = restTemplate.exchange(
+                baseUrl + "/search?name=Smartphone",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {}
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
+    }
+    @Test
+    void testSearchProducts() {
+        Product product1 = Product.builder()
+                .id("1")
+                .name("Smartphone")
+                .price(599.99)
+                .rating(4.5)
+                .category("electronics")
+                .subCategory("mobile")
+                .inventoryCount(50)
+                .mainImg("image_url")
+                .build();
+
+        Product product2 = Product.builder()
+                .id("2")
+                .name("Laptop")
+                .price(999.99)
+                .rating(4.7)
+                .category("electronics")
+                .subCategory("computers")
+                .inventoryCount(20)
+                .mainImg("image_url")
+                .build();
+
+        productRepository.saveAll(List.of(product1, product2));
+
+        ResponseEntity<List<Product>> response = restTemplate.exchange(
+                baseUrl + "/search?name=Smartphone&category=electronics&minPrice=500&maxPrice=600&sortBy=name&sortOrder=asc",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {}
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
+    }
+
+    @Test
+    void testSearchProductsUsingPrice() {
+        Product product1 = Product.builder()
+                .id("1")
+                .name("Smartphone")
+                .price(599.99)
+                .rating(4.5)
+                .category("electronics")
+                .subCategory("mobile")
+                .inventoryCount(50)
+                .mainImg("image_url")
+                .build();
+
+        Product product2 = Product.builder()
+                .id("2")
+                .name("Laptop")
+                .price(999.99)
+                .rating(4.7)
+                .category("electronics")
+                .subCategory("computers")
+                .inventoryCount(20)
+                .mainImg("image_url")
+                .build();
+
+        productRepository.saveAll(List.of(product1, product2));
+
+        ResponseEntity<List<Product>> response = restTemplate.exchange(
+                baseUrl + "/search?minPrice=500&maxPrice=600",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {}
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
     }
 }
