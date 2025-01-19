@@ -22,7 +22,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: E-commerce/E-com-backend
+        working-directory: E-com-backend
 
     steps:
     - uses: actions/checkout@v4
