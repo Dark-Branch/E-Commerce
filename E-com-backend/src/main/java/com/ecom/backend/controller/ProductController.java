@@ -25,39 +25,77 @@ public class ProductController {
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
+    // FIXME: do i need to split category and subcategory into two endpoints
 
-    // change this to give from each category
+    // Fetch products by category
     @GetMapping("/category/{category}")
-    // unknown type because error is also can be returned
     public ResponseEntity<?> getProductByCategory(
             @PathVariable String category,
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "limit", defaultValue = "10") int limit,
-            @RequestParam(value = "subCategory", required = false) String subCategory) {
+            @RequestParam(value = "limit", defaultValue = "10") int limit) {
 
         if (page < 0 || limit <= 0) {
             return ResponseEntity.badRequest().body("Page must be >= 0 and limit > 0");
         }
 
-        if (subCategory == null) {
+        try {
             var products = productService.getProductsOfCategory(category, page, limit);
+
+
+            if (products.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No products found for the given category.");
+            }
+
             return ResponseEntity.ok(products.getContent());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while fetching products by category.");
+        }
+    }
+
+    // Fetch products by category and subcategory
+    @GetMapping("/categoryAndSubCategory/{category}/{subCategory}")
+    public ResponseEntity<?> getProductsByCategoryAndSubCategory(
+            @PathVariable String category,
+            @PathVariable String subCategory,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "limit", defaultValue = "10") int limit) {
+
+        if (page < 0 || limit <= 0) {
+            return ResponseEntity.badRequest().body("Page must be >= 0 and limit > 0");
         }
 
-        var products = productService.getProductsOfCategoryAndSubCategory(category, subCategory, page, limit);
-        return ResponseEntity.ok(products.getContent());
+        try {
+            var products = productService.getProductsOfCategoryAndSubCategory(category, subCategory, page, limit);
+
+            if (products.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("No products found for the given category and subcategory.");
+            }
+
+            return ResponseEntity.ok(products.getContent());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while fetching products by category and subcategory.");
+        }
     }
-    // FIXME: do i need to split category and subcategory into two endpoints
+
+
 
     @GetMapping("/search")
     public ResponseEntity<?> searchProducts(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String category,
+            @RequestParam(required = false) String subcategory,
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) List<String> tag,
             @RequestParam(required = false, defaultValue = "name") String sortBy,
             @RequestParam(required = false, defaultValue = "asc") String sortOrder) {
-        List<Product> products = productService.searchProducts(name, category, minPrice, maxPrice, sortBy, sortOrder);
+
+
+        List<Document> products = productService.searchProducts(name, category, subcategory, tag, minPrice, maxPrice, sortBy, sortOrder);
+      
         return ResponseEntity.ok(products);
     }
 
