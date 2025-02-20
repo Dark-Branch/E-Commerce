@@ -1,8 +1,13 @@
 package com.ecom.backend.controller;
 
+import com.ecom.backend.DTO.JwtResponse;
+import com.ecom.backend.DTO.LoginRequest;
+import com.ecom.backend.DTO.SignupRequest;
 import com.ecom.backend.model.User;
+import com.ecom.backend.service.AuthService;
 import com.ecom.backend.service.UserService;
-import com.ecom.backend.utils.JwtUtil;
+import com.ecom.backend.security.JwtUtils;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,34 +22,25 @@ import java.security.Principal;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
+    private final AuthService authService;
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
-
-    public AuthController(AuthenticationManager authenticationManager, UserService userService,
-                          PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
-        this.authenticationManager = authenticationManager;
+    public AuthController(AuthService authService, UserService userService) {
+        this.authService = authService;
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userService.createUser(user);
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
+        User registeredUser = authService.registerUser(signupRequest);
         return ResponseEntity.ok("User registered successfully");
     }
     // TODO: role selection logic
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody User user) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPassword()));
-            String token = jwtUtil.generateToken(user.getUserName());
-            return ResponseEntity.ok(token);
+            String token = authService.authenticateUser(loginRequest);
+            return ResponseEntity.ok(new JwtResponse(token));
         } catch (AuthenticationException e) {
             return ResponseEntity.status(401).body("Invalid username or password");
         }
