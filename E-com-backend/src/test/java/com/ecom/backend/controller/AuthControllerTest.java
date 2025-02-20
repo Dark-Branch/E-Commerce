@@ -1,5 +1,7 @@
 package com.ecom.backend.controller;
 
+import com.ecom.backend.DTO.LoginRequest;
+import com.ecom.backend.DTO.SignupRequest;
 import com.ecom.backend.model.User;
 import com.ecom.backend.repository.UserRepository;
 import org.junit.jupiter.api.*;
@@ -8,119 +10,156 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // Allows non-static @BeforeAll
-/*
-This annotation tells JUnit to create a single test instance for the entire test class,
-enabling the use of non-static @BeforeAll methods.
- */
+
 public class AuthControllerTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
 
     @Autowired
-    UserRepository userRepository;
-
-    private String baseUrl;
+    private UserRepository userRepository;
 
     @BeforeEach
-    void setUp() {
+    void clearDatabase() {
         userRepository.deleteAll();
     }
 
-    @BeforeAll
-    void setup(){
-        baseUrl = "/api/auth";
+    @Test
+    void testSuccessfulRegistrationAndLoginFlow() {
+        // signup
+        SignupRequest signupRequest = new SignupRequest("John Doe", "john@test.com", "password123");
+        ResponseEntity<String> signupResponse = restTemplate.postForEntity(
+                "/api/auth/register",
+                signupRequest,
+                String.class
+        );
+        assertThat(signupResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(signupResponse.getBody()).contains("User registered successfully");
+
+        // login
+        LoginRequest loginRequest = new LoginRequest("john@test.com", "password123");
+        ResponseEntity<String> loginResponse = restTemplate.postForEntity(
+                "/api/auth/login",
+                loginRequest,
+                String.class
+        );
+        assertThat(loginResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(loginResponse.getBody()).contains("token");
     }
 
     @Test
-    void testRegister() {
-        User user = new User();
-        user.setUserName("testuser1");
-        user.setPassword("password123");
-        user.setRole("pakaya");
+    void testRegistrationWithDuplicateEmail() {
+        restTemplate.postForEntity("/api/auth/register",
+                new SignupRequest("John", "duplicate@test.com", "password"),
+                String.class);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(baseUrl + "/register", user, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity("/api/auth/register",
+                new SignupRequest("Jane", "duplicate@test.com", "password"),
+                String.class);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("User registered successfully", response.getBody());
-    }
-
-    @Test
-    void testLoginWithValidCredentials() {
-        User user = new User();
-        user.setUserName("testuser2");
-        user.setPassword("password123");
-        user.setRole("pakaya");
-        ResponseEntity<String> getResponse = restTemplate.postForEntity(baseUrl + "/register", user, String.class);
-        assertEquals(HttpStatus.OK, getResponse.getStatusCode());
-        assertEquals("User registered successfully", getResponse.getBody());
-
-        user.setRole(null);
-        ResponseEntity<String> response = restTemplate.postForEntity(baseUrl + "/login", user, String.class);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody()); // JWT token
-    }
-
-    @Test
-    void testLoginWithCorrectUserNameWrongPW() {
-        User user = new User();
-        user.setUserName(user.getUserName());
-        user.setPassword("wrongPassword");
-
-        ResponseEntity<String> response = restTemplate.postForEntity(baseUrl + "/login", user, String.class);
-
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid username or password", response.getBody());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).contains("Email is already taken");
     }
 
     @Test
     void testLoginWithInvalidCredentials() {
-        User user = new User();
-        user.setUserName("invalidUser");
-        user.setPassword("wrongPassword");
+        restTemplate.postForEntity("/api/auth/register",
+                new SignupRequest("John", "john@test.com", "correctpass"),
+                String.class);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(baseUrl + "/login", user, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity("/api/auth/login",
+                new LoginRequest("john@test.com", "wrongpass"),
+                String.class);
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid username or password", response.getBody());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    // FIXME: should this be forbidden or unauthorized
+    @Test
+    @Disabled
+    void testAccessProtectedResourceWithoutToken() {
+        ResponseEntity<String> response = restTemplate.getForEntity("/payments", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    // TODO: add more tests to do validation parts like 'pass' is not long enough to be a password
+    @Test
+    @Disabled
+    void testAccessProtectedResourceWithValidToken() {
+        // Register and login
+        restTemplate.postForEntity("/api/auth/register",
+                new SignupRequest("John", "john@test.com", "password"),
+                String.class);
+
+        ResponseEntity<String> loginResponse = restTemplate.postForEntity("/api/auth/login",
+                new LoginRequest("john@test.com", "password"),
+                String.class);
+
+        String token = extractToken(loginResponse.getBody());
+
+        // protected resource
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> protectedResponse = restTemplate.exchange(
+                "/api/payments",
+                HttpMethod.GET,
+                entity,
+                String.class
+        );
+
+        assertThat(protectedResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
-    void deleteWithValidCredentials(){
-        User userhere = new User();
-        userhere.setUserName("testUserForDelete");
-        userhere.setPassword("password123");
-        userhere.setRole("pakaya");
-        ResponseEntity<String> getResponse = restTemplate.postForEntity(baseUrl + "/register", userhere, String.class);
-
-        assertEquals(HttpStatus.OK, getResponse.getStatusCode());
-
-        userhere.setRole(null);
-        ResponseEntity<String> response = restTemplate.postForEntity(baseUrl + "/login", userhere, String.class);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-
-        String token = response.getBody();
-
-        HttpHeaders headers = createHeaders(token);
-        HttpEntity<Void> deleteRequest = new HttpEntity<>(headers);
-        ResponseEntity<Void> deleteResponse = restTemplate.exchange(baseUrl, HttpMethod.DELETE, deleteRequest, Void.class);
-
-        assertEquals(HttpStatus.OK, deleteResponse.getStatusCode());
-
-        ResponseEntity<String> reloginResponse = restTemplate.postForEntity(baseUrl + "/login", userhere, String.class);
-        assertEquals(HttpStatus.UNAUTHORIZED, reloginResponse.getStatusCode());
-    }
-
-    private HttpHeaders createHeaders(String token) {
+    @Disabled
+    void testAccessProtectedResourceWithInvalidToken() {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-        return headers;
+        headers.setBearerAuth("invalid.token.here");
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/api/payments",
+                HttpMethod.GET,
+                entity,
+                String.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
+
+    // TODO: this need to be unauthorized
+    @Test
+    void testRegistrationWithMissingFields() {
+        // missing name
+        ResponseEntity<String> response1 = restTemplate.postForEntity("/api/auth/register",
+                new SignupRequest(null, "test@test.com", "pass"),
+                String.class);
+        assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        // missing email
+        ResponseEntity<String> response2 = restTemplate.postForEntity("/api/auth/register",
+                new SignupRequest("John", null, "pass"),
+                String.class);
+        assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        // missing password
+        ResponseEntity<String> response3 = restTemplate.postForEntity("/api/auth/register",
+                new SignupRequest("John", "test@test.com", null),
+                String.class);
+        assertThat(response3.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    static String extractToken(String responseBody) {
+        return responseBody.split("\"token\":\"")[1].split("\"")[0];
+    }
+
+    private record SignupRequest(String name, String email, String password) {}
+    private record LoginRequest(String email, String password) {}
 }

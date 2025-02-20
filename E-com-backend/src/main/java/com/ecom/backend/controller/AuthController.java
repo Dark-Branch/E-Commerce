@@ -1,5 +1,6 @@
 package com.ecom.backend.controller;
 
+import com.ecom.backend.DTO.JwtResponse;
 import com.ecom.backend.DTO.LoginRequest;
 import com.ecom.backend.DTO.SignupRequest;
 import com.ecom.backend.model.User;
@@ -29,17 +30,17 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody SignupRequest signupRequest) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
         User registeredUser = authService.registerUser(signupRequest);
         return ResponseEntity.ok("User registered successfully");
     }
     // TODO: role selection logic
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
             String token = authService.authenticateUser(loginRequest);
-            return ResponseEntity.ok(token);
+            return ResponseEntity.ok(new JwtResponse(token));
         } catch (AuthenticationException e) {
             return ResponseEntity.status(401).body("Invalid username or password");
         }
