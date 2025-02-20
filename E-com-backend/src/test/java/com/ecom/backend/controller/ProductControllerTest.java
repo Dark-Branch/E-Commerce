@@ -29,10 +29,6 @@ import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ProductControllerTest {
-
-    @LocalServerPort
-    private int port; // Inject the random port number
-
     @Autowired
     private TestRestTemplate restTemplate;
 
@@ -43,7 +39,7 @@ public class ProductControllerTest {
 
     @BeforeEach
     void setUp() {
-        baseUrl = "/products";
+        baseUrl = "/api/products";
         productRepository.deleteAll();
     }
 
@@ -58,13 +54,12 @@ public class ProductControllerTest {
         product.setMainImg("https://example.com/images/headphones-main.jpg");
         product.setInventoryCount(15);
 
-        ResponseEntity<Product> response = restTemplate.postForEntity("/products", product, Product.class);
-
+        ResponseEntity<Void> response = restTemplate.postForEntity(baseUrl, product, Void.class);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
 
         HttpHeaders headers = response.getHeaders();
         URI location = headers.getLocation();
-        assert location != null;
+        assertNotNull(location, "Location header should not be null");
 
         ResponseEntity<Product> getResponse = restTemplate.getForEntity(location, Product.class);
 
@@ -137,6 +132,7 @@ public class ProductControllerTest {
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
     }
+
     @Test
     void testSearchProducts() {
         Product product1 = Product.builder()

@@ -15,7 +15,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/api/products")
 public class ProductController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
@@ -81,8 +81,6 @@ public class ProductController {
         }
     }
 
-
-
     @GetMapping("/search")
     public ResponseEntity<?> searchProducts(
             @RequestParam(required = false) String name,
@@ -103,9 +101,8 @@ public class ProductController {
     // TODO: make this sellers only
     @PostMapping
     public ResponseEntity<Void> createProduct(@RequestBody Product product, UriComponentsBuilder ucb) {
-
         Product product1 =  productService.createProduct(product);
-        URI uri = ucb.path("/products/{id}").buildAndExpand(product1.getId()).toUri();
+        URI uri = ucb.path("/api/products/{id}").buildAndExpand(product1.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
 
