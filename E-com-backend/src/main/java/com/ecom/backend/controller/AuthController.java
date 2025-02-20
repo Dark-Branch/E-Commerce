@@ -2,7 +2,7 @@ package com.ecom.backend.controller;
 
 import com.ecom.backend.model.User;
 import com.ecom.backend.service.UserService;
-import com.ecom.backend.utils.JwtUtil;
+import com.ecom.backend.security.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;

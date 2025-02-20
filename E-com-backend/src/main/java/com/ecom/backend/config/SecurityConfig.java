@@ -1,6 +1,6 @@
 package com.ecom.backend.config;
 
-import com.ecom.backend.filter.JwtFilter;
+import com.ecom.backend.security.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

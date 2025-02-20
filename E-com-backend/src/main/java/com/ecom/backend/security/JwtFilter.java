@@ -1,6 +1,5 @@
-package com.ecom.backend.filter;
+package com.ecom.backend.security;
 
-import com.ecom.backend.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

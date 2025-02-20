@@ -1,4 +1,4 @@
-package com.ecom.backend.utils;
+package com.ecom.backend.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
