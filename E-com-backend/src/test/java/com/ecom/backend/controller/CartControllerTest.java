@@ -4,8 +4,11 @@ import com.ecom.backend.DTO.CheckoutRequest;
 import com.ecom.backend.model.Cart;
 import com.ecom.backend.model.Order;
 import com.ecom.backend.model.Product;
+import com.ecom.backend.model.User;
 import com.ecom.backend.repository.CartRepository;
 import com.ecom.backend.repository.ProductRepository;
+import com.ecom.backend.repository.UserRepository;
+import com.ecom.backend.service.AuthService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -21,6 +24,8 @@ import org.springframework.http.ResponseEntity;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static com.ecom.backend.testUtils.AuthUtils.saveUser;
+import static com.ecom.backend.testUtils.AuthUtils.setupSignedUserAndGetToken;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -33,16 +38,31 @@ public class CartControllerTest {
     private CartRepository cartRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private AuthService authService;
 
     private Cart existingCart;
     private Product newProduct;
+    private String baseUrl;
+    private User user;
+    private String token;
 
     @BeforeEach
     void setUp() {
+        baseUrl = "/api/cart";
+
+        userRepository.deleteAll();
+        user = saveUser(user, authService, "example@example.com");
+        token = setupSignedUserAndGetToken(user, restTemplate);
+
         Product product = new Product("Test Product", "Category", "SubCategory", 10.0, "0006" , 9);
-        product.setInventoryCount(20);
         newProduct = productRepository.save(product);
+
 
         Date date = new Date();
         existingCart = Cart.builder()
@@ -68,7 +88,7 @@ public class CartControllerTest {
         HttpEntity<Cart.CartItem> request = new HttpEntity<>(cartItem);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                "/cart/{cartId}/add",
+                baseUrl + "/{cartId}/add",
                 HttpMethod.POST,
                 request,
                 String.class,
@@ -93,7 +113,7 @@ public class CartControllerTest {
         HttpEntity<Cart.CartItem> request = new HttpEntity<>(cartItem);
 
         restTemplate.exchange(
-                "/cart/{cartId}/add",
+                baseUrl + "/{cartId}/add",
                 HttpMethod.POST,
                 request,
                 String.class,
@@ -101,7 +121,7 @@ public class CartControllerTest {
         );
 
         ResponseEntity<String> response = restTemplate.exchange(
-                "/cart/{cartId}/add",
+                baseUrl + "/{cartId}/add",
                 HttpMethod.POST,
                 request,
                 String.class,
@@ -126,7 +146,7 @@ public class CartControllerTest {
         HttpEntity<Cart.CartItem> request = new HttpEntity<>(cartItem);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                "/cart/{cartId}/add",
+                baseUrl + "/{cartId}/add",
                 HttpMethod.POST,
                 request,
                 String.class,
@@ -142,7 +162,7 @@ public class CartControllerTest {
         String nonExistentCartId = "nonExistentCartId";
 
         ResponseEntity<String> response = restTemplate.exchange(
-                "/cart/{cartId}",
+                baseUrl + "/{cartId}",
                 HttpMethod.GET,
                 null,
                 String.class,
@@ -158,7 +178,7 @@ public class CartControllerTest {
         String userId = existingCart.getUserId();
 
         ResponseEntity<Cart> response = restTemplate.exchange(
-                "/cart?userId=" + userId,
+                baseUrl + "?userId=" + userId,
                 HttpMethod.GET,
                 null,
                 Cart.class
@@ -182,7 +202,7 @@ public class CartControllerTest {
         cartRepository.save(guestCart);
 
         ResponseEntity<Cart> response = restTemplate.exchange(
-                "/cart?sessionId=" + sessionId,
+                baseUrl + "?sessionId=" + sessionId,
                 HttpMethod.GET,
                 null,
                 Cart.class
@@ -196,7 +216,7 @@ public class CartControllerTest {
     @Test
     void getCart_WithNeitherUserIdNorSessionId_ReturnsBadRequest() {
         ResponseEntity<String> response = restTemplate.exchange(
-                "/cart",
+                baseUrl,
                 HttpMethod.GET,
                 null,
                 String.class
@@ -211,7 +231,7 @@ public class CartControllerTest {
         String newUserId = "newUserId";
 
         ResponseEntity<Cart> response = restTemplate.exchange(
-                "/cart?userId=" + newUserId,
+                baseUrl + "?userId=" + newUserId,
                 HttpMethod.GET,
                 null,
                 Cart.class
@@ -228,7 +248,7 @@ public class CartControllerTest {
         String newSessionId = "newSessionId";
 
         ResponseEntity<Cart> response = restTemplate.exchange(
-                "/cart?sessionId=" + newSessionId,
+                baseUrl + "?sessionId=" + newSessionId,
                 HttpMethod.GET,
                 null,
                 Cart.class
@@ -247,7 +267,7 @@ public class CartControllerTest {
         cartRepository.save(existingCart);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                "/cart/{cartId}/remove?productId={productId}",
+                baseUrl + "/{cartId}/remove?productId={productId}",
                 HttpMethod.POST,
                 null,
                 String.class,
@@ -278,7 +298,7 @@ public class CartControllerTest {
         cartRepository.save(guestCart);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                "/cart/remove?sessionId=" + sessionId + "&productId=" + newProduct.getId(),
+                baseUrl + "/remove?sessionId=" + sessionId + "&productId=" + newProduct.getId(),
                 HttpMethod.POST,
                 null,
                 String.class
@@ -296,7 +316,7 @@ public class CartControllerTest {
         String nonExistentProductId = "nonExistentProductId";
 
         ResponseEntity<String> response = restTemplate.exchange(
-                "/cart/{cartId}/remove?productId={productId}",
+                baseUrl + "/{cartId}/remove?productId={productId}",
                 HttpMethod.POST,
                 null,
                 String.class,
@@ -314,7 +334,7 @@ public class CartControllerTest {
         String productId = newProduct.getId();
 
         ResponseEntity<String> response = restTemplate.exchange(
-                "/cart/{cartId}/remove?productId={productId}",
+                baseUrl + "/{cartId}/remove?productId={productId}",
                 HttpMethod.POST,
                 null,
                 String.class,
@@ -333,7 +353,7 @@ public class CartControllerTest {
         cartRepository.save(existingCart);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                "/cart/{cartId}",
+                baseUrl + "/{cartId}",
                 HttpMethod.DELETE,
                 null,
                 String.class,

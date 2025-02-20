@@ -16,7 +16,7 @@ import java.net.URI;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/cart")
+@RequestMapping("/api/cart")
 public class CartController {
 
     @Autowired
@@ -40,7 +40,7 @@ public class CartController {
     @PostMapping
     public ResponseEntity<Void> createCart(UriComponentsBuilder ucb) {
         Cart newCart =  cartService.createCart();
-        URI uri = ucb.path("/cart/{id}").buildAndExpand(newCart.getId()).toUri();
+        URI uri = ucb.path("/api/cart/{id}").buildAndExpand(newCart.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
 
@@ -52,6 +52,7 @@ public class CartController {
         cartService.addItemToCart(cartId, cartItem);
         return ResponseEntity.ok("Item added to cart");
     }
+
     @PostMapping("/{cartId}/remove")
     public ResponseEntity<String> removeItemFromCart(@PathVariable String cartId,
                                                      @RequestParam String productId) {

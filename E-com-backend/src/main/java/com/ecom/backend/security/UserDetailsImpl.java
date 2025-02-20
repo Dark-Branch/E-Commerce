@@ -24,8 +24,9 @@ public class UserDetailsImpl implements UserDetails {
         return user.getPassword();
     }
 
+    // jwt works with id hereon
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return user.getId();
     }
 }
