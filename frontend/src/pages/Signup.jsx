@@ -1,18 +1,18 @@
+import * as yup from "yup";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { signupUser } from "../api/auth"; // Import API function
-import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import Topbar from '../components/TopbarWithoutButtons';
+import { signupUser } from "../api/auth";
+import Topbar from "../components/Topbar";
+
+
 
 const schema = yup.object().shape({
-    userName: yup.string().min(3, "Username must be at least 3 characters").max(50).required("Username is required"),
+    name: yup.string().min(3, "Name must be at least 3 characters").max(50).required("Name is required"),
     email: yup.string().email("Invalid email").required("Email is required"),
     password: yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
-    confirmPassword: yup.string()
-        .oneOf([yup.ref("password"), null], "Passwords must match")
-        .required("Confirm password is required"),
+    confirmPassword: yup.string().oneOf([yup.ref("password"), null], "Passwords must match"),
 });
 
 function Signup() {
@@ -24,17 +24,24 @@ function Signup() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
-    const navigate = useNavigate(); // Initialize the navigate function
+    const navigate = useNavigate();
 
-    const onSubmit = async (data) => {
+    const onSubmit = async (formData) => {
+        const data = {
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+        };
+
+        console.log(data); // Log formatted data
+
         setLoading(true);
         setError("");
         setSuccess("");
         try {
-            await signupUser(data); // Call the API to create an account
+            await signupUser(data); // Send formatted data to API
             setSuccess("Account created successfully!");
             
-            // Redirect to login after 2 seconds
             setTimeout(() => {
                 navigate("/login");
             }, 1000);
@@ -55,9 +62,9 @@ function Signup() {
                     {success && <p className="text-green-500 text-sm mb-2">{success}</p>}
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Username</label>
-                            <input {...register("userName")} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-                            <p className="text-red-500 text-xs mt-1">{errors.userName?.message}</p>
+                            <label className="block text-sm font-medium text-gray-700">Name</label>
+                            <input {...register("name")} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                            <p className="text-red-500 text-xs mt-1">{errors.name?.message}</p>
                         </div>
 
                         <div>
@@ -78,7 +85,7 @@ function Signup() {
                             <p className="text-red-500 text-xs mt-1">{errors.confirmPassword?.message}</p>
                         </div>
 
-                        <button type="submit" className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" disabled={loading}>
+                        <button type="submit" className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" disabled={loading}>
                             {loading ? "Signing Up..." : "Sign Up"}
                         </button>
                     </form>
