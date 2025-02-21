@@ -72,8 +72,9 @@ public class CartService {
         cartRepository.save(cart);
     }
 
-    public void removeItemFromCart(String cartId, String productId) {
-        Cart cart = getCartById(cartId);
+    public void removeItemFromCart(String userId, String productId) {
+        // FIXME: is this need to be done in two steps?
+        Cart cart = getOrCreateCart(userId, null);
 
         boolean itemExists = cart.getItems().stream()
                 .anyMatch(item -> item.getProductId().equals(productId));
@@ -134,6 +135,7 @@ public class CartService {
         return cartRepository.save(newCart);
     }
 
+    // TODO: change cartId logic to userId logic
     public Cart updateCart(Cart cart) {
 
         if (!cartRepository.existsById(cart.getId())) {

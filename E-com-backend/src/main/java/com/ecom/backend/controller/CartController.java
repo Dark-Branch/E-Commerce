@@ -51,10 +51,10 @@ public class CartController {
         return ResponseEntity.ok("Item added to cart");
     }
 
-    @PostMapping("/{cartId}/remove")
-    public ResponseEntity<String> removeItemFromCart(@PathVariable String cartId,
-                                                     @RequestParam String productId) {
-        cartService.removeItemFromCart(cartId, productId);
+    @PostMapping("/remove")
+    public ResponseEntity<String> removeItemFromCart(@RequestParam(required = true) String productId, Principal principal) {
+        String userId = principal.getName();
+        cartService.removeItemFromCart(userId, productId);
         return ResponseEntity.ok("Item removed from cart");
     }
 
