@@ -168,19 +168,20 @@ public class CartControllerTest {
     }
 
     @Test
-    void getCart_WithUserId_ReturnsCart() {
-        String userId = existingCart.getUserId();
+    void getCart_WithValidUser_ReturnsCart() {
+        HttpHeaders headers = getHttpHeadersWithToken(token);
+        HttpEntity<Cart.CartItem> request = new HttpEntity<>(headers);
 
         ResponseEntity<Cart> response = restTemplate.exchange(
-                baseUrl + "?userId=" + userId,
+                baseUrl,
                 HttpMethod.GET,
-                null,
+                request,
                 Cart.class
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getUserId()).isEqualTo(userId);
+        assertThat(response.getBody().getUserId()).isEqualTo(user.getId());
     }
 
     @Test
@@ -209,7 +210,7 @@ public class CartControllerTest {
     }
 
     @Test
-    void getCart_WithNeitherUserIdNorSessionId_ReturnsBadRequest() {
+    void getCart_WithInvalidCredentials_ReturnsForbidden() {
         ResponseEntity<String> response = restTemplate.exchange(
                 baseUrl,
                 HttpMethod.GET,
@@ -217,25 +218,7 @@ public class CartControllerTest {
                 String.class
         );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).contains("Either userId or sessionId must be provided");
-    }
-
-    @Test
-    void getCart_WithNonExistentUserId_CreatesNewCart() {
-        String newUserId = "newUserId";
-
-        ResponseEntity<Cart> response = restTemplate.exchange(
-                baseUrl + "?userId=" + newUserId,
-                HttpMethod.GET,
-                null,
-                Cart.class
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getUserId()).isEqualTo(newUserId);
-        assertThat(response.getBody().getItems()).isEmpty();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test

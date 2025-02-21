@@ -29,9 +29,9 @@ public class CartController {
 
     // TODO: refactor with session object
     @GetMapping
-    public ResponseEntity<?> getCart(
-            @RequestParam(required = false) String userId,
-            @RequestParam(required = false) String sessionId){
+    public ResponseEntity<?> getCart(@RequestParam(required = false) String sessionId,
+                                     Principal principal){
+        String userId = principal.getName();
         Cart cart = cartService.getOrCreateCart(userId, sessionId);
         return ResponseEntity.ok(cart);
     }
