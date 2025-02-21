@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-//                        .requestMatchers("/api/cart/**").authenticated()
+                        .requestMatchers("/api/cart/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session
