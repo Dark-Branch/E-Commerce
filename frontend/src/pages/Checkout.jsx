@@ -4,6 +4,7 @@ import master from "../assets/master.png";
 import visa from "../assets/visa.png";
 import Amex from "../assets/Amex.png";
 import cod from "../assets/cod.png";
+import { useLocation } from "react-router-dom";
 
 
 const address = {
@@ -24,7 +25,12 @@ const order ={
 
 
 const CheckoutPage = () => {
+  const location = useLocation();
+  const cartItems = location.state;
+
+
   return (
+    
     <>
           <Topbar/>
        
@@ -92,7 +98,7 @@ const CheckoutPage = () => {
             <h2 className="text-lg font-medium border-b pb-2 mb-4">Order Summary</h2>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Item {order.item}</span>
+                <span>Items {order.item}</span>
                 <span>Rs : {order.price}</span>
               </div>
               <div className="flex justify-between text-sm">

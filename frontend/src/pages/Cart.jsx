@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";  // Import useNavigate
 import Topbar from "../components/Topbar";
 import Navbar from "../components/Navbar";
+import { removeFromCart, getCart } from "../api/cart";
 
 const ShoppingCartPage = () => {
   const [cartItems, setCartItems] = useState([
@@ -11,11 +12,26 @@ const ShoppingCartPage = () => {
     { id: 4, name: "Lenovo ThinkBook 16", price: 54.89, quantity: 2 },
   ]);
 
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        const data = await getCart(); // Fetch cart items
+        setCartItems(data); // Update state
+      } catch (error) {
+        console.error("Failed to fetch cart", error);
+      }
+    };
+
+    fetchCart();
+  }, [cartItems]);
+
   const navigate = useNavigate();  // Initialize useNavigate
 
   // Handle the navigation when the button is clicked
   const handleGoToCheckout = () => {
-    navigate("/checkout");  // Navigate to the checkout page
+    
+
+    navigate("/checkout",{state:cartItems});  // Navigate to the checkout page
   };
 
   const updateQuantity = (id, delta) => {
@@ -29,6 +45,11 @@ const ShoppingCartPage = () => {
   };
 
   const removeItem = (id) => {
+    try {
+      removeFromCart(id);
+    } catch (err) {
+      console.error(err);
+    }
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
@@ -37,6 +58,19 @@ const ShoppingCartPage = () => {
     0
   );
   const shipping = 148.49;
+
+  const [selectedItems, setSelectedItems] = useState([]);  // Initialize selectedItems state
+
+  const handleCheckboxTick = (itemID) => {  
+    if (selectedItems.includes(itemID)) {  // If itemID is already in selectedItems
+      setSelectedItems(selectedItems.filter((id) => id !== itemID));  // Remove itemID from selectedItems
+    } else {
+      setSelectedItems([...selectedItems, itemID]);  // Add itemID to selectedItems
+    }
+    console.log(selectedItems);  // Log selectedItems
+  }
+
+
 
   return (
     <div>
@@ -57,8 +91,12 @@ const ShoppingCartPage = () => {
                 key={item.id}
                 className="flex items-center justify-between border-b py-4"
               >
+                <input onClick={() => handleCheckboxTick(item.id)} type="checkbox" className="cursor-pointer m-5" />
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-gray-200 rounded-md"></div>
+                  <div className="w-16 h-16 bg-gray-200 rounded-md">
+                    {/* set link for the image */}
+                    {/* <img src={item.imgLink} className="h-10"/> */}
+                  </div>
                   <span className="text-sm font-medium">{item.name}</span>
                 </div>
                 <span className="text-sm">${item.price.toFixed(2)}</span>
