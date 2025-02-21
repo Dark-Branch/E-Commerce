@@ -37,7 +37,8 @@ function Login() {
     
 
     return (
-        <div className="flex items-center justify-center mt-10">
+      
+        <div className="flex items-center justify-center h-screen">
             <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6 rounded shadow-md w-80">
                 <h2 className="text-xl font-bold mb-4">Login</h2>
 
@@ -54,7 +55,7 @@ function Login() {
                     <p className="text-red-500 text-xs mt-1">{errors.password?.message}</p>
                 </div>
 
-                <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded" disabled={loading}>
+                <button type="submit" className="w-full bg-purple-500 text-white py-2 rounded" disabled={loading}>
                     {loading ? "Logging in..." : "Login"}
                 </button>
             </form>
