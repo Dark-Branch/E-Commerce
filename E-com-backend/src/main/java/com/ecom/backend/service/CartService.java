@@ -49,8 +49,9 @@ public class CartService {
         cartRepository.save(cart);
     }
 
-    public void addItemToCart(String cartId, Cart.CartItem cartItem) {
-        Cart cart = getCartById(cartId);
+    // TODO: sessions
+    public void addItemToCart(String userId, Cart.CartItem cartItem) {
+        Cart cart = getOrCreateCart(userId, null);
 
         List<Cart.CartItem> items = cart.getItems();
         boolean itemUpdated = false;

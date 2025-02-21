@@ -44,12 +44,10 @@ public class CartController {
         return ResponseEntity.created(uri).build();
     }
 
-    // FIXME: for now i get userId from client -> change when implementing security
-
-    @PostMapping("/{cartId}/add")
-    public ResponseEntity<String> addItemToCart(@PathVariable String cartId,
-                                                @RequestBody Cart.CartItem cartItem) {
-        cartService.addItemToCart(cartId, cartItem);
+    @PostMapping("/add")
+    public ResponseEntity<String> addItemToCart(@RequestBody Cart.CartItem cartItem, Principal principal) {
+        String userId = principal.getName();
+        cartService.addItemToCart(userId, cartItem);
         return ResponseEntity.ok("Item added to cart");
     }
 
