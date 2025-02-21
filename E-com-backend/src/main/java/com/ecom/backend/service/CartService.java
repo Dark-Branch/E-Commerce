@@ -43,8 +43,9 @@ public class CartService {
         cartRepository.delete(cart);
     }
 
-    public void clearCart(String cartId) {
-        Cart cart = getCartById(cartId);
+    public void clearCart(String userId) {
+        // TODO: need changing
+        Cart cart = getOrCreateCart(userId, null);
         cart.getItems().clear();
         cartRepository.save(cart);
     }

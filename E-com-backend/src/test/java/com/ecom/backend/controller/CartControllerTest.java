@@ -381,10 +381,13 @@ public class CartControllerTest {
         existingCart.getItems().add(item);
         cartRepository.save(existingCart);
 
+        HttpHeaders headers = getHttpHeadersWithToken(token);
+        HttpEntity<Cart.CartItem> request = new HttpEntity<>(headers);
+
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl + "/{cartId}",
+                baseUrl,
                 HttpMethod.DELETE,
-                null,
+                request,
                 String.class,
                 existingCart.getId()
         );
@@ -396,4 +399,29 @@ public class CartControllerTest {
         assertThat(updatedCart.getItems()).isEmpty();
     }
 
+    // FIXME: forbidden or unauthorized
+    @Test
+    void clearCart_InvalidCredentials_ThrowsForbiddenException() {
+        Cart.CartItem item = new Cart.CartItem(newProduct.getId(), 1, null, newProduct.getPrice());
+        existingCart.getItems().add(item);
+        cartRepository.save(existingCart);
+
+        HttpHeaders headers = getHttpHeadersWithToken("invalidToken");
+        HttpEntity<Cart.CartItem> request = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl,
+                HttpMethod.DELETE,
+                request,
+                String.class,
+                existingCart.getId()
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+
+        assertThat(response.getBody()).contains("Forbidden");
+
+        Cart updatedCart = cartRepository.findById(existingCart.getId()).orElseThrow();
+        assertThat(updatedCart.getItems()).isNotEmpty();
+    }
 }

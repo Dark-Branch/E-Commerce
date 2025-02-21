@@ -36,14 +36,6 @@ public class CartController {
         return ResponseEntity.ok(cart);
     }
 
-    // TODO: remove if no use
-    @PostMapping
-    public ResponseEntity<Void> createCart(UriComponentsBuilder ucb) {
-        Cart newCart =  cartService.createCart();
-        URI uri = ucb.path("/api/cart/{id}").buildAndExpand(newCart.getId()).toUri();
-        return ResponseEntity.created(uri).build();
-    }
-
     @PostMapping("/add")
     public ResponseEntity<String> addItemToCart(@RequestBody Cart.CartItem cartItem, Principal principal) {
         String userId = principal.getName();
@@ -58,9 +50,10 @@ public class CartController {
         return ResponseEntity.ok("Item removed from cart");
     }
 
-    @DeleteMapping("/{cartId}")
-    public ResponseEntity<String> clearCart(@PathVariable String cartId) {
-        cartService.clearCart(cartId);
+    @DeleteMapping
+    public ResponseEntity<String> clearCart(Principal principal) {
+        String userId = principal.getName();
+        cartService.clearCart(userId);
         return ResponseEntity.ok("Cart cleared");
     }
 
