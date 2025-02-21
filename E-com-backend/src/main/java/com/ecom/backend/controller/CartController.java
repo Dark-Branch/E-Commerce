@@ -16,7 +16,7 @@ import java.net.URI;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/cart")
+@RequestMapping("/api/cart")
 public class CartController {
 
     @Autowired
@@ -29,39 +29,31 @@ public class CartController {
 
     // TODO: refactor with session object
     @GetMapping
-    public ResponseEntity<?> getCart(
-            @RequestParam(required = false) String userId,
-            @RequestParam(required = false) String sessionId){
+    public ResponseEntity<?> getCart(@RequestParam(required = false) String sessionId,
+                                     Principal principal){
+        String userId = principal.getName();
         Cart cart = cartService.getOrCreateCart(userId, sessionId);
         return ResponseEntity.ok(cart);
     }
 
-    // TODO: remove if no use
-    @PostMapping
-    public ResponseEntity<Void> createCart(UriComponentsBuilder ucb) {
-        Cart newCart =  cartService.createCart();
-        URI uri = ucb.path("/cart/{id}").buildAndExpand(newCart.getId()).toUri();
-        return ResponseEntity.created(uri).build();
-    }
-
-    // FIXME: for now i get userId from client -> change when implementing security
-
-    @PostMapping("/{cartId}/add")
-    public ResponseEntity<String> addItemToCart(@PathVariable String cartId,
-                                                @RequestBody Cart.CartItem cartItem) {
-        cartService.addItemToCart(cartId, cartItem);
+    @PostMapping("/add")
+    public ResponseEntity<String> addItemToCart(@RequestBody Cart.CartItem cartItem, Principal principal) {
+        String userId = principal.getName();
+        cartService.addItemToCart(userId, cartItem);
         return ResponseEntity.ok("Item added to cart");
     }
-    @PostMapping("/{cartId}/remove")
-    public ResponseEntity<String> removeItemFromCart(@PathVariable String cartId,
-                                                     @RequestParam String productId) {
-        cartService.removeItemFromCart(cartId, productId);
+
+    @PostMapping("/remove")
+    public ResponseEntity<String> removeItemFromCart(@RequestParam(required = true) String productId, Principal principal) {
+        String userId = principal.getName();
+        cartService.removeItemFromCart(userId, productId);
         return ResponseEntity.ok("Item removed from cart");
     }
 
-    @DeleteMapping("/{cartId}")
-    public ResponseEntity<String> clearCart(@PathVariable String cartId) {
-        cartService.clearCart(cartId);
+    @DeleteMapping
+    public ResponseEntity<String> clearCart(Principal principal) {
+        String userId = principal.getName();
+        cartService.clearCart(userId);
         return ResponseEntity.ok("Cart cleared");
     }
 
