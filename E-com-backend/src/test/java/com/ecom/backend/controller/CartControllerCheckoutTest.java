@@ -4,24 +4,25 @@ import com.ecom.backend.DTO.CheckoutRequest;
 import com.ecom.backend.model.Cart;
 import com.ecom.backend.model.Order;
 import com.ecom.backend.model.Product;
+import com.ecom.backend.model.User;
 import com.ecom.backend.repository.CartRepository;
 import com.ecom.backend.repository.ProductRepository;
+import com.ecom.backend.repository.UserRepository;
+import com.ecom.backend.service.AuthService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.ecom.backend.testUtils.AuthUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,11 +39,29 @@ public class CartControllerCheckoutTest {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private AuthService authService;
+
     private Cart existingCart;
     private Product newProduct;
+    private String baseUrl;
+    private User user;
+    private String token;
 
     @BeforeEach
     void setUp() {
+        baseUrl = "/api/cart";
+
+        cartRepository.deleteAll();
+        productRepository.deleteAll();
+        userRepository.deleteAll();
+
+        user = saveUser(user, authService, "example@example.com");
+        token = setupSignedUserAndGetToken(user, restTemplate);
+
         Product product = new Product("Test Product", "Category", "SubCategory", 10.0,"0008", 5);
         product.setInventoryCount(20);
         newProduct = productRepository.save(product);
@@ -58,12 +77,6 @@ public class CartControllerCheckoutTest {
         existingCart = cartRepository.save(existingCart);
     }
 
-    @AfterEach
-    void tearDown() {
-        cartRepository.deleteAll();
-        productRepository.deleteAll();
-    }
-
     @Test
     void checkoutCart_SuccessfulCheckout_ReturnsOrder() {
         // make checkout request, get order id, then send order request to confirm
@@ -71,7 +84,8 @@ public class CartControllerCheckoutTest {
         existingCart.getItems().add(cartItem1);
         cartRepository.save(existingCart);
 
-        CheckoutRequest request = new CheckoutRequest(
+
+        CheckoutRequest checkoutRequest = new CheckoutRequest(
                 existingCart.getId(),
                 "123 Main St, City, Country",
                 "Credit Card",
@@ -79,10 +93,13 @@ public class CartControllerCheckoutTest {
                 List.of(new Cart.CartItem(newProduct.getId(), 1, "v1", newProduct.getPrice()))
         );
 
+        HttpHeaders headers = getHttpHeadersWithToken(token);
+        HttpEntity<CheckoutRequest> request = new HttpEntity<>(checkoutRequest, headers);
+
         ResponseEntity<Void> response = restTemplate.exchange(
-                "/cart/checkout",
+                baseUrl + "/checkout",
                 HttpMethod.POST,
-                new HttpEntity<>(request),
+                request,
                 Void.class
         );
 
@@ -90,12 +107,10 @@ public class CartControllerCheckoutTest {
         assertTrue(response.getHeaders().containsKey("Location"));
         assertThat(response.getHeaders().getLocation()).isNotNull();
 
-        // confirm cart
         Cart updatedCart = cartRepository.findById(existingCart.getId()).orElseThrow();
         assertThat(updatedCart.getItems()).hasSize(1);
         assertThat(updatedCart.getItems().get(0).getQuantity()).isEqualTo(1); // Remaining quantity
 
-        // confirm order is placed by sending a request
         URI orderLocation = response.getHeaders().getLocation();
         assertThat(orderLocation).isNotNull();
 
@@ -115,7 +130,7 @@ public class CartControllerCheckoutTest {
 
     @Test
     void checkoutCart_NoItemsSelected_ThrowsBadRequest() {
-        CheckoutRequest request = new CheckoutRequest(
+        CheckoutRequest checkoutRequest = new CheckoutRequest(
                 existingCart.getId(),
                 "123 Main St, City, Country",
                 "Credit Card",
@@ -123,10 +138,13 @@ public class CartControllerCheckoutTest {
                 List.of() // No items selected
         );
 
+        HttpHeaders headers = getHttpHeadersWithToken(token);
+        HttpEntity<CheckoutRequest> request = new HttpEntity<>(checkoutRequest, headers);
+
         ResponseEntity<String> response = restTemplate.exchange(
-                "/cart/checkout",
+                baseUrl + "/checkout",
                 HttpMethod.POST,
-                new HttpEntity<>(request),
+                request,
                 String.class
         );
 
@@ -136,7 +154,7 @@ public class CartControllerCheckoutTest {
 
     @Test
     void checkoutCart_ProductNotFoundInCart_ThrowsNotFoundException() {
-        CheckoutRequest request = new CheckoutRequest(
+        CheckoutRequest checkoutRequest = new CheckoutRequest(
                 existingCart.getId(),
                 "123 Main St, City, Country",
                 "Credit Card",
@@ -144,10 +162,13 @@ public class CartControllerCheckoutTest {
                 List.of(new Cart.CartItem("nonExistentProductId", 1, "v1", 10.0))
         );
 
+        HttpHeaders headers = getHttpHeadersWithToken(token);
+        HttpEntity<CheckoutRequest> request = new HttpEntity<>(checkoutRequest, headers);
+
         ResponseEntity<String> response = restTemplate.exchange(
-                "/cart/checkout",
+                baseUrl + "/checkout",
                 HttpMethod.POST,
-                new HttpEntity<>(request),
+                request,
                 String.class
         );
 
@@ -161,7 +182,7 @@ public class CartControllerCheckoutTest {
         existingCart.getItems().add(cartItem1);
         cartRepository.save(existingCart);
 
-        CheckoutRequest request = new CheckoutRequest(
+        CheckoutRequest checkoutRequest = new CheckoutRequest(
                 existingCart.getId(),
                 "123 Main St, City, Country",
                 "Credit Card",
@@ -169,10 +190,13 @@ public class CartControllerCheckoutTest {
                 List.of(new Cart.CartItem(newProduct.getId(), 3, "v1", newProduct.getPrice()))
         );
 
+        HttpHeaders headers = getHttpHeadersWithToken(token);
+        HttpEntity<CheckoutRequest> request = new HttpEntity<>(checkoutRequest, headers);
+
         ResponseEntity<String> response = restTemplate.exchange(
-                "/cart/checkout",
+                baseUrl + "/checkout",
                 HttpMethod.POST,
-                new HttpEntity<>(request),
+                request,
                 String.class
         );
 
@@ -191,7 +215,7 @@ public class CartControllerCheckoutTest {
         newProduct.setInventoryCount(0);
         productRepository.save(newProduct);
 
-        CheckoutRequest request = new CheckoutRequest(
+        CheckoutRequest checkoutRequest = new CheckoutRequest(
                 existingCart.getId(),
                 "123 Main St, City, Country",
                 "Credit Card",
@@ -199,10 +223,13 @@ public class CartControllerCheckoutTest {
                 List.of(new Cart.CartItem(newProduct.getId(), 1, "v1", newProduct.getPrice()))
         );
 
+        HttpHeaders headers = getHttpHeadersWithToken(token);
+        HttpEntity<CheckoutRequest> request = new HttpEntity<>(checkoutRequest, headers);
+
         ResponseEntity<String> response = restTemplate.exchange(
-                "/cart/checkout",
+                baseUrl + "/checkout",
                 HttpMethod.POST,
-                new HttpEntity<>(request),
+                request,
                 String.class
         );
 
