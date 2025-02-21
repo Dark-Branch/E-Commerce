@@ -43,14 +43,16 @@ public class CartService {
         cartRepository.delete(cart);
     }
 
-    public void clearCart(String cartId) {
-        Cart cart = getCartById(cartId);
+    public void clearCart(String userId) {
+        // TODO: need changing
+        Cart cart = getOrCreateCart(userId, null);
         cart.getItems().clear();
         cartRepository.save(cart);
     }
 
-    public void addItemToCart(String cartId, Cart.CartItem cartItem) {
-        Cart cart = getCartById(cartId);
+    // TODO: sessions
+    public void addItemToCart(String userId, Cart.CartItem cartItem) {
+        Cart cart = getOrCreateCart(userId, null);
 
         List<Cart.CartItem> items = cart.getItems();
         boolean itemUpdated = false;
@@ -71,8 +73,9 @@ public class CartService {
         cartRepository.save(cart);
     }
 
-    public void removeItemFromCart(String cartId, String productId) {
-        Cart cart = getCartById(cartId);
+    public void removeItemFromCart(String userId, String productId) {
+        // FIXME: is this need to be done in two steps?
+        Cart cart = getOrCreateCart(userId, null);
 
         boolean itemExists = cart.getItems().stream()
                 .anyMatch(item -> item.getProductId().equals(productId));
@@ -133,6 +136,7 @@ public class CartService {
         return cartRepository.save(newCart);
     }
 
+    // TODO: change cartId logic to userId logic
     public Cart updateCart(Cart cart) {
 
         if (!cartRepository.existsById(cart.getId())) {
