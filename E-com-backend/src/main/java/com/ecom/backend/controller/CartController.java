@@ -61,8 +61,9 @@ public class CartController {
     @PostMapping("/checkout")
     public ResponseEntity<Void> convertCartToOrder(@RequestBody CheckoutRequest request,
                                                     UriComponentsBuilder ucb, Principal principal) {
-        Order order = checkoutService.checkoutCart(request);
-        URI uri = ucb.path("/orders/{id}").buildAndExpand(order.getId()).toUri();
+        String userId = principal.getName();
+        Order order = checkoutService.checkoutCart(request, userId);
+        URI uri = ucb.path("/api/orders/{id}").buildAndExpand(order.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
 }

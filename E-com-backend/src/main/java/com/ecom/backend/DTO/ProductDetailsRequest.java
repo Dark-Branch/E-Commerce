@@ -4,7 +4,6 @@ import com.ecom.backend.model.Product;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-
 import java.util.List;
 
 @Data

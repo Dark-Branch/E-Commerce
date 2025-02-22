@@ -26,7 +26,7 @@ public class CheckoutService {
     private ProductService productService;
 
 
-    public Order checkoutCart(CheckoutRequest request) {
+    public Order checkoutCart(CheckoutRequest request, String userId) {
 
         Cart cart = cartService.getCartById(request.getCartID());
 
@@ -40,7 +40,7 @@ public class CheckoutService {
                 .paymentMethod(request.getPaymentMethod())
                 .status("Pending")
                 .instructions(request.getInstructions())
-                .userName(cart.getUserId()) // TODO: use token later
+                .userId(userId)
                 .createdAt(date)
                 .updatedAt(date)
                 .address(request.getAddress())

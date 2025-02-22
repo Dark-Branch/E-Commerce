@@ -3,7 +3,6 @@ package com.ecom.backend.DTO;
 import com.ecom.backend.model.Cart;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 

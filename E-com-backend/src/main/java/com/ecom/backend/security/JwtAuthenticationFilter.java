@@ -1,6 +1,5 @@
 package com.ecom.backend.security;
 
-import com.ecom.backend.exception.UnauthorizedException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
