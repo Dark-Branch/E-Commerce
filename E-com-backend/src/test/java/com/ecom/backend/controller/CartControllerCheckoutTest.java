@@ -84,7 +84,6 @@ public class CartControllerCheckoutTest {
         existingCart.getItems().add(cartItem1);
         cartRepository.save(existingCart);
 
-
         CheckoutRequest checkoutRequest = new CheckoutRequest(
                 existingCart.getId(),
                 "123 Main St, City, Country",
@@ -114,10 +113,13 @@ public class CartControllerCheckoutTest {
         URI orderLocation = response.getHeaders().getLocation();
         assertThat(orderLocation).isNotNull();
 
+        HttpEntity<CheckoutRequest> getRequest = new HttpEntity<>(headers);
+
+        System.out.println(orderLocation);
         ResponseEntity<Order> orderResponse = restTemplate.exchange(
                 orderLocation,
                 HttpMethod.GET,
-                null,
+                getRequest,
                 Order.class
         );
 
