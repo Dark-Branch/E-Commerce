@@ -17,14 +17,11 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Order>> getOrdersByUserName(@PathVariable String userName) {
-        List<Order> orders = orderService.getOrdersByUserName(userName);
-        if (orders.isEmpty()) {
-            return ResponseEntity.ok(orders);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @GetMapping("/history")
+    public ResponseEntity<List<Order>> getOrderHistory(Principal principal) {
+        String userId = principal.getName();
+        List<Order> orders = orderService.getOrdersByUserId(userId);
+        return ResponseEntity.ok(orders);
     }
 
     @GetMapping("/{id}")
@@ -39,7 +36,7 @@ public class OrderController {
                                             UriComponentsBuilder ucb,
                                             Principal principal) {
         String username = principal.getName();
-        order.setUserName(username);
+        order.setUserId(username);
         Order newOrder = orderService.createOrder(order);
         URI uri = ucb.path("/api/orders/{id}").buildAndExpand(newOrder.getId()).toUri();
         return ResponseEntity.created(uri).build();
