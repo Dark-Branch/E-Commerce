@@ -12,7 +12,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 public class OrderController {
     @Autowired
     private OrderService orderService;
@@ -27,14 +27,10 @@ public class OrderController {
         }
     }
 
-//    @PatchMapping("/{id}")
-//    public ResponseEntity<Void> confirmOrder(@PathVariable String id){
-//
-//    }
-
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable String id) {
-        Order order = orderService.getOrderById(id);
+    public ResponseEntity<Order> getOrderById(@PathVariable String id, Principal principal) {
+        String userId = principal.getName();
+        Order order = orderService.getOrderById(id, userId);
         return ResponseEntity.ok(order);
     }
 
@@ -45,7 +41,7 @@ public class OrderController {
         String username = principal.getName();
         order.setUserName(username);
         Order newOrder = orderService.createOrder(order);
-        URI uri = ucb.path("/orders/{id}").buildAndExpand(newOrder.getId()).toUri();
+        URI uri = ucb.path("/api/orders/{id}").buildAndExpand(newOrder.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
 }
