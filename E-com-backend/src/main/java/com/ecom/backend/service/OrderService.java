@@ -44,4 +44,34 @@ public class OrderService {
         order.setStatus("Confirmed");
         orderRepository.save(order);
     }
+
+    @Transactional
+    public Order editOrder(String id, Order updatedOrder, String userId) {
+        Order existingOrder = getOrderById(id, userId);
+        if (!"Pending".equals(existingOrder.getStatus())) {
+            throw new IllegalStateException("Order cannot be edited. Current status: " + existingOrder.getStatus());
+        }
+
+        if (updatedOrder.getAddress() != null) {
+            existingOrder.setAddress(updatedOrder.getAddress());
+        }
+        if (updatedOrder.getInstructions() != null) {
+            existingOrder.setInstructions(updatedOrder.getInstructions());
+        }
+        if (updatedOrder.getPaymentMethod() != null) {
+            existingOrder.setPaymentMethod(updatedOrder.getPaymentMethod());
+        }
+        if (updatedOrder.getItems() != null) {
+            existingOrder.setItems(updatedOrder.getItems());
+            existingOrder.setTotalAmount(calculateTotalAmount(updatedOrder.getItems()));
+        }
+
+        return orderRepository.save(existingOrder);
+    }
+
+    private double calculateTotalAmount(List<Order.OrderItem> items) {
+        return items.stream()
+                .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                .sum();
+    }
 }

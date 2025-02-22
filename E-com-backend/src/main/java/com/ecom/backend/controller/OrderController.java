@@ -38,6 +38,13 @@ public class OrderController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Order> editOrder(@PathVariable String id, @RequestBody Order updatedOrder, Principal principal) {
+        String userId = principal.getName();
+        Order order = orderService.editOrder(id, updatedOrder, userId);
+        return ResponseEntity.ok(order);
+    }
+
     @PostMapping
     public ResponseEntity<Void> createOrder(@RequestBody Order order,
                                             UriComponentsBuilder ucb,

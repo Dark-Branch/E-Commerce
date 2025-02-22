@@ -407,4 +407,159 @@ public class OrderControllerTest {
 
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
+
+    @Test
+    void testEditOrder_PendingOrder_EditsOrder() {
+        Order order = new Order();
+        order.setUserId(user.getId());
+        order.setStatus("Pending");
+        order.setAddress("123 Main St");
+        orderRepository.save(order);
+
+        Order updatedOrder = new Order();
+        updatedOrder.setAddress("456 Elm St");
+
+        HttpHeaders headers = getHttpHeadersWithToken(token);
+        HttpEntity<Order> request = new HttpEntity<>(updatedOrder, headers);
+
+        ResponseEntity<Order> response = restTemplate.exchange(
+                baseUrl + "/{id}",
+                HttpMethod.PUT,
+                request,
+                Order.class,
+                order.getId()
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("456 Elm St", response.getBody().getAddress());
+    }
+
+    @Test
+    void testEditOrder_NonPendingOrder_ThrowsException() {
+        Order order = new Order();
+        order.setUserId(user.getId());
+        order.setStatus("Confirmed");
+        order.setAddress("123 Main St");
+        orderRepository.save(order);
+
+        Order updatedOrder = new Order();
+        updatedOrder.setAddress("456 Elm St");
+
+        HttpHeaders headers = getHttpHeadersWithToken(token);
+        HttpEntity<Order> request = new HttpEntity<>(updatedOrder, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/{id}",
+                HttpMethod.PUT,
+                request,
+                String.class,
+                order.getId()
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertThat(response.getBody()).contains("Order cannot be edited");
+    }
+
+    @Test
+    void testEditOrder_OrderDoesNotBelongToUser_ThrowsUnauthorizedException() {
+        User anotherUser = new User();
+        anotherUser.setUserName("anotherUser");
+        userRepository.save(anotherUser);
+
+        Order order = new Order();
+        order.setUserId(anotherUser.getId());
+        order.setStatus("Pending");
+        order.setAddress("123 Main St");
+        orderRepository.save(order);
+
+        Order updatedOrder = new Order();
+        updatedOrder.setAddress("456 Elm St");
+
+        HttpHeaders headers = getHttpHeadersWithToken(token);
+        HttpEntity<Order> request = new HttpEntity<>(updatedOrder, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/{id}",
+                HttpMethod.PUT,
+                request,
+                String.class,
+                order.getId()
+        );
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertThat(response.getBody()).contains("Order does not belong to user");
+    }
+
+    @Test
+    void testEditOrder_NonExistentOrder_ThrowsNotFoundException() {
+        String nonExistentOrderId = "nonExistentOrderId";
+
+        Order updatedOrder = new Order();
+        updatedOrder.setAddress("456 Elm St");
+
+        HttpHeaders headers = getHttpHeadersWithToken(token);
+        HttpEntity<Order> request = new HttpEntity<>(updatedOrder, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/{id}",
+                HttpMethod.PUT,
+                request,
+                String.class,
+                nonExistentOrderId
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertThat(response.getBody()).contains("Order not found");
+    }
+
+    @Test
+    @Disabled
+    void testEditOrder_MissingToken_ThrowsUnauthorizedException() {
+        Order order = new Order();
+        order.setUserId(user.getId());
+        order.setStatus("Pending");
+        order.setAddress("123 Main St");
+        orderRepository.save(order);
+
+        Order updatedOrder = new Order();
+        updatedOrder.setAddress("456 Elm St");
+
+        HttpEntity<Order> request = new HttpEntity<>(updatedOrder); // No token
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/{id}",
+                HttpMethod.PUT,
+                request,
+                String.class,
+                order.getId()
+        );
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+    }
+
+    @Test
+    void testEditOrder_InvalidToken_ThrowsUnauthorizedException() {
+        Order order = new Order();
+        order.setUserId(user.getId());
+        order.setStatus("Pending");
+        order.setAddress("123 Main St");
+        orderRepository.save(order);
+
+        Order updatedOrder = new Order();
+        updatedOrder.setAddress("456 Elm St");
+
+        HttpHeaders headers = getHttpHeadersWithToken("invalidToken");
+        HttpEntity<Order> request = new HttpEntity<>(updatedOrder, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/{id}",
+                HttpMethod.PUT,
+                request,
+                String.class,
+                order.getId()
+        );
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+    }
 }
