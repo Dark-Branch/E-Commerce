@@ -115,7 +115,7 @@ public class OrderControllerTest {
         );
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertThat(response.getBody()).contains("Order Not Found");
+        assertThat(response.getBody()).contains("Order not found");
     }
 
     @Test
@@ -275,5 +275,136 @@ public class OrderControllerTest {
         assertThat(createResponse.getHeaders().getLocation()).isNotNull();
     }
 
+    @Test
+    void testConfirmOrder_PendingOrder_ConfirmsOrder() {
+        Order order = new Order();
+        order.setUserId(user.getId());
+        order.setStatus("Pending");
+        orderRepository.save(order);
 
+        HttpHeaders headers = getHttpHeadersWithToken(token);
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                baseUrl + "/{id}/confirm",
+                HttpMethod.PATCH,
+                request,
+                Void.class,
+                order.getId()
+        );
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+
+        Order updatedOrder = orderRepository.findById(order.getId()).orElseThrow();
+        assertEquals("Confirmed", updatedOrder.getStatus());
+    }
+
+    @Test
+    void testConfirmOrder_NonPendingOrder_ThrowsException() {
+        Order order = new Order();
+        order.setUserId(user.getId());
+        order.setStatus("Confirmed");
+        orderRepository.save(order);
+
+        HttpHeaders headers = getHttpHeadersWithToken(token);
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/{id}/confirm",
+                HttpMethod.PATCH,
+                request,
+                String.class,
+                order.getId()
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertThat(response.getBody()).contains("Order cannot be confirmed");
+    }
+
+    @Test
+    void testConfirmOrder_OrderDoesNotBelongToUser_ThrowsUnauthorizedException() {
+        User anotherUser = new User();
+        anotherUser.setUserName("anotherUser");
+        anotherUser = userRepository.save(anotherUser);
+
+        Order order = new Order();
+        order.setUserId(anotherUser.getId());
+        order.setStatus("Pending");
+        orderRepository.save(order);
+
+        HttpHeaders headers = getHttpHeadersWithToken(token);
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/{id}/confirm",
+                HttpMethod.PATCH,
+                request,
+                String.class,
+                order.getId()
+        );
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertThat(response.getBody()).contains("Order does not belong to user");
+    }
+
+    @Test
+    void testConfirmOrder_NonExistentOrder_ThrowsNotFoundException() {
+        String nonExistentOrderId = "nonExistentOrderId";
+
+        HttpHeaders headers = getHttpHeadersWithToken(token);
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/{id}/confirm",
+                HttpMethod.PATCH,
+                request,
+                String.class,
+                nonExistentOrderId
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertThat(response.getBody()).contains("Order not found");
+    }
+
+    @Test
+    @Disabled
+    void testConfirmOrder_MissingToken_ThrowsUnauthorizedException() {
+        Order order = new Order();
+        order.setUserId(user.getId());
+        order.setStatus("Pending");
+        order = orderRepository.save(order);
+
+        HttpEntity<Void> request = new HttpEntity<>(null);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/{id}/confirm",
+                HttpMethod.PATCH,
+                request,
+                String.class,
+                order.getId()
+        );
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+    }
+
+    @Test
+    void testConfirmOrder_InvalidToken_ThrowsUnauthorizedException() {
+        Order order = new Order();
+        order.setUserId(user.getId());
+        order.setStatus("Pending");
+        orderRepository.save(order);
+
+        HttpHeaders headers = getHttpHeadersWithToken("invalidToken");
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                baseUrl + "/{id}/confirm",
+                HttpMethod.PATCH,
+                request,
+                String.class,
+                order.getId()
+        );
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+    }
 }

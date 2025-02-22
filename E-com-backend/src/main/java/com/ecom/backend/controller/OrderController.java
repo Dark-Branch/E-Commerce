@@ -31,6 +31,13 @@ public class OrderController {
         return ResponseEntity.ok(order);
     }
 
+    @PatchMapping("/{id}/confirm")
+    public ResponseEntity<Void> confirmOrder(@PathVariable String id, Principal principal) {
+        String userId = principal.getName();
+        orderService.confirmOrder(id, userId);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping
     public ResponseEntity<Void> createOrder(@RequestBody Order order,
                                             UriComponentsBuilder ucb,
