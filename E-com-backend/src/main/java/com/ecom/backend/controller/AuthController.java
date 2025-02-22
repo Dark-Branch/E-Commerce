@@ -6,14 +6,10 @@ import com.ecom.backend.DTO.SignupRequest;
 import com.ecom.backend.model.User;
 import com.ecom.backend.service.AuthService;
 import com.ecom.backend.service.UserService;
-import com.ecom.backend.security.JwtUtils;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;

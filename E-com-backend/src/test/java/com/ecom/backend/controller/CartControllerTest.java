@@ -1,15 +1,12 @@
 package com.ecom.backend.controller;
 
-import com.ecom.backend.DTO.CheckoutRequest;
 import com.ecom.backend.model.Cart;
-import com.ecom.backend.model.Order;
 import com.ecom.backend.model.Product;
 import com.ecom.backend.model.User;
 import com.ecom.backend.repository.CartRepository;
 import com.ecom.backend.repository.ProductRepository;
 import com.ecom.backend.repository.UserRepository;
 import com.ecom.backend.service.AuthService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -18,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 

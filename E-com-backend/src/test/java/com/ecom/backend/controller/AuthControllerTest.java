@@ -1,8 +1,5 @@
 package com.ecom.backend.controller;
 
-import com.ecom.backend.DTO.LoginRequest;
-import com.ecom.backend.DTO.SignupRequest;
-import com.ecom.backend.model.User;
 import com.ecom.backend.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +8,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // Allows non-static @BeforeAll

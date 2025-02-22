@@ -2,7 +2,6 @@ package com.ecom.backend.exception;
 
 import com.mongodb.DuplicateKeyException;
 import org.apache.tomcat.websocket.AuthenticationException;
-import org.springframework.data.mongodb.core.mapping.ExplicitEncrypted;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

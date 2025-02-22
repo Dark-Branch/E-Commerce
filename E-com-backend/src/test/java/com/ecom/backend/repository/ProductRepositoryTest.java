@@ -1,4 +1,3 @@
-//package com.ecom.backend;
 package com.ecom.backend.repository;
 
 import com.ecom.backend.model.Product;
