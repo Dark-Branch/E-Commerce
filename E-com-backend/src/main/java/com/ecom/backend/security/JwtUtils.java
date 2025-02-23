@@ -2,6 +2,7 @@ package com.ecom.backend.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
@@ -12,11 +13,15 @@ import java.util.Date;
 
 @Component
 public class JwtUtils {
-    private final Key key = Keys.hmacShaKeyFor(
-            "N5a7V8c9X2d4T6f1P3k6Y9wdvs2Z8q4R5m7J1x3L6p9S2d8B4N7C5G9Q2W8T4M1F3".getBytes(StandardCharsets.UTF_8)
-    );
+    @Value("${jwt.secret}")
+    private String jwtSecret;
 
-    private final long jwtExpirationMs = 86400000; // 1 day
+    @Value("${jwt.expirationMs}")
+    private long jwtExpirationMs;
+
+    private Key getSigningKey() {
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+    }
 
     public String generateJwtToken(Authentication authentication) {
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
@@ -27,13 +32,13 @@ public class JwtUtils {
                 .setSubject(userPrincipal.getUsername())
                 .setIssuedAt(date)
                 .setExpiration(new Date(date.getTime() + jwtExpirationMs))
-                .signWith(key, SignatureAlgorithm.HS512)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
 
     public String getUsernameFromToken(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(key)
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
@@ -42,7 +47,7 @@ public class JwtUtils {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
             return true;
 //        } catch (SignatureException ex) {
 //            throw new AuthenticationException("Invalid JWT signature") {};  // Ensures 401
