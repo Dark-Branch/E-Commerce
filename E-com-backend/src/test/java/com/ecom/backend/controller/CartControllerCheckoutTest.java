@@ -1,6 +1,6 @@
 package com.ecom.backend.controller;
 
-import com.ecom.backend.DTO.CheckoutRequest;
+import com.ecom.backend.dto.CheckoutRequest;
 import com.ecom.backend.model.Cart;
 import com.ecom.backend.model.Order;
 import com.ecom.backend.model.Product;

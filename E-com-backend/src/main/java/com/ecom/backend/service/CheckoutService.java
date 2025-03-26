@@ -1,6 +1,6 @@
 package com.ecom.backend.service;
 
-import com.ecom.backend.DTO.CheckoutRequest;
+import com.ecom.backend.dto.CheckoutRequest;
 import com.ecom.backend.exception.NotEnoughStockException;
 import com.ecom.backend.exception.NotFoundException;
 import com.ecom.backend.model.Cart;
