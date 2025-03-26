@@ -1,8 +1,6 @@
-import React from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-//import ItemCard from '../components/ItemCard';
-import Topbar from '../components/Topbar';
+import TopBar from '../components/Topbar';
 import ItemSet from '../components/ItemSet';
 import Banner from '../components/Banner';
 
@@ -13,6 +11,20 @@ const TrendingItems = [
     price: 99.99,
     rating: 4.5,
     reviews: 120,
+  },
+  {
+    image: "https://via.placeholder.com/150",
+    title: "Smartphone",
+    price: 699.99,
+    rating: 4.8,
+    reviews: 95,
+  },
+  {
+    image: "https://via.placeholder.com/150",
+    title: "Smartphone",
+    price: 699.99,
+    rating: 4.8,
+    reviews: 95,
   },
   {
     image: "https://via.placeholder.com/150",
@@ -42,7 +54,7 @@ const TrendingItems = [
 const Homepage = () => {
   return (
     <div>
-      <Topbar />
+      <TopBar />
       <Navbar />
       <Banner/> 
 
@@ -100,16 +112,13 @@ const Homepage = () => {
       </div>
     </section>
       
-      <ItemSet title="Trending Treasures" items={TrendingItems} />   
-      <ItemSet title="Toys and Games" items={TrendingItems} />   
-      <ItemSet title="Top picks for Sri Lanka" items={TrendingItems} />   
-      <ItemSet title="Wireless Tech" items={TrendingItems} />   
-      <ItemSet title="Level up your beauty routine" items={TrendingItems} />  
-      <ItemSet title="clothing,shoes and jewellery" items={TrendingItems} />  
+      <ItemSet title="Trending Now" items={TrendingItems} />
+      <ItemSet title="Best Picks for You" items={TrendingItems} />
+      <ItemSet title="New Arrivals" items={TrendingItems} />
+      <ItemSet title="Top Rated" items={TrendingItems} />
+      {/*<ItemSet title="Level up your beauty routine" items={TrendingItems} />  */}
+      {/*<ItemSet title="clothing,shoes and jewellery" items={TrendingItems} />*/}
 
-
-
-      
       <Footer/>
     </div>
   );

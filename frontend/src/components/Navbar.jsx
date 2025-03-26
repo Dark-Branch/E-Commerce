@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 const categories = [
-  "Explore (New!)",
   "Electronics",
   "Motors",
   "Fashion",
