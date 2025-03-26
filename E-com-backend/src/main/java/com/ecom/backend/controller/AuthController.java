@@ -35,7 +35,6 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
-            System.out.println("token");
             String token = authService.authenticateUser(loginRequest);
             return ResponseEntity.ok(new JwtResponse(token));
         } catch (AuthenticationException e) {
