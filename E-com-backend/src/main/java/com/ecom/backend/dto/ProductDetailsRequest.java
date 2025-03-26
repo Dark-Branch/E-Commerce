@@ -1,4 +1,4 @@
-package com.ecom.backend.DTO;
+package com.ecom.backend.dto;
 
 import com.ecom.backend.model.Product;
 import lombok.AllArgsConstructor;

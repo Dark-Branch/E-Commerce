@@ -1,7 +1,7 @@
 package com.ecom.backend.service;
 
-import com.ecom.backend.DTO.LoginRequest;
-import com.ecom.backend.DTO.SignupRequest;
+import com.ecom.backend.dto.LoginRequest;
+import com.ecom.backend.dto.SignupRequest;
 import com.ecom.backend.exception.InvalidRequestException;
 import com.ecom.backend.model.User;
 import com.ecom.backend.repository.UserRepository;

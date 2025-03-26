@@ -1,8 +1,8 @@
 package com.ecom.backend.controller;
 
-import com.ecom.backend.DTO.JwtResponse;
-import com.ecom.backend.DTO.LoginRequest;
-import com.ecom.backend.DTO.SignupRequest;
+import com.ecom.backend.dto.JwtResponse;
+import com.ecom.backend.dto.LoginRequest;
+import com.ecom.backend.dto.SignupRequest;
 import com.ecom.backend.model.User;
 import com.ecom.backend.service.AuthService;
 import com.ecom.backend.service.UserService;
