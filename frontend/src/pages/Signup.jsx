@@ -33,8 +33,6 @@ function Signup() {
             password: formData.password,
         };
 
-        console.log(data); // Log formatted data
-
         setLoading(true);
         setError("");
         setSuccess("");
